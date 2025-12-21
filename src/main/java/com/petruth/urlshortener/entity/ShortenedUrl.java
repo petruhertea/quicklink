@@ -6,7 +6,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "shortened_url")
+@Table(name = "shortened_url", indexes = {
+        @Index(name = "idx_code", columnList = "code")
+})
 public class ShortenedUrl {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,14 +23,27 @@ public class ShortenedUrl {
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
 
+    @Column(name = "click_count")
+    private Long clickCount = 0L;
+
+    @Column(name = "last_accessed")
+    private LocalDateTime lastAccessed;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user; // nullable for anonymous URLs
+
     public ShortenedUrl(){}
 
-    public ShortenedUrl(Long id, String longUrl, String shortUrl, String code, LocalDateTime dateCreated) {
+    public ShortenedUrl(Long id, String longUrl, String shortUrl, String code, LocalDateTime dateCreated, Long clickCount, LocalDateTime lastAccessed, User user) {
         this.id = id;
         this.longUrl = longUrl;
         this.shortUrl = shortUrl;
         this.code = code;
         this.dateCreated = dateCreated;
+        this.clickCount = clickCount;
+        this.lastAccessed = lastAccessed;
+        this.user = user;
     }
 
     public Long getId() {
@@ -71,14 +86,27 @@ public class ShortenedUrl {
         this.dateCreated = dateCreated;
     }
 
-    @Override
-    public String toString() {
-        return "ShortenedUrl{" +
-                "id=" + id +
-                ", longUrl='" + longUrl + '\'' +
-                ", shortUrl='" + shortUrl + '\'' +
-                ", code='" + code + '\'' +
-                ", dateCreated='" + dateCreated + '\'' +
-                '}';
+    public Long getClickCount() {
+        return clickCount;
+    }
+
+    public void setClickCount(Long clickCount) {
+        this.clickCount = clickCount;
+    }
+
+    public LocalDateTime getLastAccessed() {
+        return lastAccessed;
+    }
+
+    public void setLastAccessed(LocalDateTime lastAccessed) {
+        this.lastAccessed = lastAccessed;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

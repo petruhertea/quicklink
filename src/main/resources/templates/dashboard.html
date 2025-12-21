@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - QuickLink</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .stats-card h3 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 0;
+        }
+        .stats-card p {
+            color: #6c757d;
+            margin: 0;
+        }
+        .url-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        .url-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .url-code {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .click-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .btn-copy {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .btn-copy:hover {
+            background: #e9ecef;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <span style="color: #667eea;">Quick</span><span style="color: #764ba2;">Link</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active fw-bold" href="/dashboard">Dashboard</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle user-profile" href="#" id="navbarDropdown"
+                       role="button" data-bs-toggle="dropdown">
+                        <img th:src="${user.profilePicture}" alt="Profile" class="user-avatar">
+                        <span th:text="${user.name}">User</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item">Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container mt-4">
+    <!-- Welcome Header -->
+    <div class="mb-4">
+        <h2 class="fw-bold">Welcome back, <span th:text="${user.name}">User</span>! 👋</h2>
+        <p class="text-muted">Here's an overview of your shortened links</p>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stats-card">
+                <h3 th:text="${stats.totalLinks}">0</h3>
+                <p>Total Links</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <h3 th:text="${stats.totalClicks}">0</h3>
+                <p>Total Clicks</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <h3 th:text="${stats.clicksToday}">0</h3>
+                <p>Clicks Today</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Shorten Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Create New Short Link</h5>
+            <form id="quickShortenForm">
+                <div class="input-group">
+                    <input
+                            type="url"
+                            class="form-control"
+                            id="quickUrlInput"
+                            placeholder="Paste your long URL here..."
+                            required>
+                    <button class="btn btn-primary" type="submit">Shorten</button>
+                </div>
+            </form>
+            <div id="quickResultBox" class="mt-3" style="display: none;">
+                <div class="alert alert-success">
+                    <strong>Success!</strong> Your link has been created.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Links List -->
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Your Links</h5>
+        </div>
+        <div class="card-body p-0">
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(urls)}" class="empty-state">
+                <div class="empty-state-icon">🔗</div>
+                <h4>No links yet</h4>
+                <p>Create your first shortened link above to get started!</p>
+            </div>
+
+            <!-- Links List -->
+            <div th:if="${!#lists.isEmpty(urls)}">
+                <div th:each="url : ${urls}" class="url-card">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <span class="url-code" th:text="${url.code}">abc123</span>
+                                <span class="click-badge ms-2">
+                                        <span th:text="${url.clickCount}">0</span> clicks
+                                    </span>
+                            </div>
+                            <div class="text-truncate text-muted small">
+                                <strong>Original:</strong>
+                                <a th:href="${url.longUrl}"
+                                   th:text="${url.longUrl}"
+                                   target="_blank"
+                                   class="text-decoration-none">
+                                    https://example.com/very/long/url
+                                </a>
+                            </div>
+                            <div class="text-muted small mt-1">
+                                <strong>Created:</strong>
+                                <span th:text="${#temporals.format(url.dateCreated, 'MMM dd, yyyy HH:mm')}">
+                                        Jan 01, 2024 12:00
+                                    </span>
+                                <span th:if="${url.lastAccessed}">
+                                        | <strong>Last accessed:</strong>
+                                        <span th:text="${#temporals.format(url.lastAccessed, 'MMM dd, yyyy HH:mm')}">
+                                            Jan 01, 2024 12:00
+                                        </span>
+                                    </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <div class="input-group">
+                                <input
+                                        type="text"
+                                        class="form-control short-url-input"
+                                        th:value="${url.shortUrl}"
+                                        readonly>
+                                <button
+                                        class="btn btn-copy copy-link-btn"
+                                        type="button"
+                                        th:data-url="${url.shortUrl}">
+                                    📋 Copy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Callout (if not premium) -->
+    <div th:if="${!user.premium}" class="alert alert-info mt-4">
+        <h5>🚀 Upgrade to Premium</h5>
+        <p class="mb-2">Get advanced analytics, custom domains, and remove ads for just $5/month</p>
+        <button class="btn btn-primary btn-sm">Upgrade Now</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Quick shorten form
+    document.getElementById('quickShortenForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const urlInput = document.getElementById('quickUrlInput');
+        const resultBox = document.getElementById('quickResultBox');
+
+        try {
+            const response = await fetch('/api/shorten', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url: urlInput.value })
+            });
+
+            if (response.ok) {
+                resultBox.style.display = 'block';
+                urlInput.value = '';
+
+                // Reload page after 1 second to show new link
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        } catch (error) {
+            alert('Failed to shorten URL. Please try again.');
+        }
+    });
+
+    // Copy buttons
+    document.querySelectorAll('.copy-link-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            navigator.clipboard.writeText(url);
+
+            const originalText = this.textContent;
+            this.textContent = '✓ Copied!';
+            setTimeout(() => {
+                this.textContent = originalText;
+            }, 2000);
+        });
+    });
+</script>
+</body>
+</html>
