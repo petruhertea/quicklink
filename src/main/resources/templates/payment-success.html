@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Success - QuickLink</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .success-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 3rem;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            animation: scaleIn 0.5s ease-out;
+        }
+        .success-icon svg {
+            width: 50px;
+            height: 50px;
+            stroke: white;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+        .premium-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+        .benefits {
+            text-align: left;
+            margin: 2rem 0;
+        }
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .benefit-icon {
+            width: 30px;
+            height: 30px;
+            background: #e8f5e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="success-card">
+    <div class="success-icon">
+        <svg viewBox="0 0 52 52">
+            <polyline points="14 27 22 35 38 19"/>
+        </svg>
+    </div>
+
+    <h1 class="h2 mb-3">Welcome to Premium! 🎉</h1>
+    <p class="text-muted">Your payment was successful</p>
+
+    <div class="premium-badge">
+        ⭐ PREMIUM MEMBER
+    </div>
+
+    <div class="benefits">
+        <h5 class="mb-3">Your Premium Benefits:</h5>
+
+        <div class="benefit-item">
+            <div class="benefit-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#4caf50" viewBox="0 0 16 16">
+                    <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+                </svg>
+            </div>
+            <span><strong>No Ads</strong> - Clean, distraction-free experience</span>
+        </div>
+
+        <div class="benefit-item">
+            <div class="benefit-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#4caf50" viewBox="0 0 16 16">
+                    <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+                </svg>
+            </div>
+            <span><strong>Custom Short Codes</strong> - Choose your own memorable URLs</span>
+        </div>
+
+        <div class="benefit-item">
+            <div class="benefit-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#4caf50" viewBox="0 0 16 16">
+                    <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+                </svg>
+            </div>
+            <span><strong>Advanced Analytics</strong> - Detailed insights and reports</span>
+        </div>
+
+        <div class="benefit-item">
+            <div class="benefit-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#4caf50" viewBox="0 0 16 16">
+                    <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+                </svg>
+            </div>
+            <span><strong>Higher Limits</strong> - 500 links per hour (vs 50 for free)</span>
+        </div>
+
+        <div class="benefit-item">
+            <div class="benefit-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#4caf50" viewBox="0 0 16 16">
+                    <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+                </svg>
+            </div>
+            <span><strong>Priority Support</strong> - Get help when you need it</span>
+        </div>
+    </div>
+
+    <a href="/dashboard" class="btn btn-primary btn-lg w-100 mt-3">
+        Go to Dashboard
+    </a>
+
+    <p class="text-muted small mt-3">
+        Session ID: <code th:text="${sessionId}">session_id</code>
+    </p>
+</div>
+</body>
+</html>

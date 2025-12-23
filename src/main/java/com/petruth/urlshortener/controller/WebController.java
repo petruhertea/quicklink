@@ -32,6 +32,11 @@ public class WebController {
         return "index";
     }
 
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal OAuth2User principal, OAuth2AuthenticationToken authToken,Model model) {
         if (principal == null) {

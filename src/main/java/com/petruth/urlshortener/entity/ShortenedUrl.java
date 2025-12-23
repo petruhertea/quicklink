@@ -23,6 +23,9 @@ public class ShortenedUrl {
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
 
+    @Column(name = "expires_at")
+    private LocalDateTime expiresAt;
+
     @Column(name = "click_count")
     private Long clickCount = 0L;
 
@@ -100,6 +103,14 @@ public class ShortenedUrl {
 
     public void setLastAccessed(LocalDateTime lastAccessed) {
         this.lastAccessed = lastAccessed;
+    }
+
+    public LocalDateTime getExpiresAt() {
+        return expiresAt;
+    }
+
+    public void setExpiresAt(LocalDateTime expiresAt) {
+        this.expiresAt = expiresAt;
     }
 
     public User getUser() {

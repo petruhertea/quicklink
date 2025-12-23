@@ -73,15 +73,52 @@
             font-size: 4rem;
             margin-bottom: 1rem;
         }
-        .user-profile {
+        .user-profile-btn {
             display: flex;
             align-items: center;
             gap: 10px;
+            padding: 6px 12px;
+            border-radius: 25px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            text-decoration: none;
+            color: #212529;
+            transition: all 0.3s;
+        }
+        .user-profile-btn:hover {
+            background: white;
+            border-color: #667eea;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
         }
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+        }
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .dropdown-menu {
+            min-width: 250px;
+            border-radius: 12px;
+            border: none;
+            padding: 0.5rem;
+        }
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            transition: all 0.2s;
+        }
+        .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+        .dropdown-header {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e9ecef;
         }
     </style>
 </head>
@@ -246,7 +283,11 @@
     <div th:if="${!user.premium}" class="alert alert-info mt-4">
         <h5>🚀 Upgrade to Premium</h5>
         <p class="mb-2">Get advanced analytics, custom domains, and remove ads for just $5/month</p>
-        <button class="btn btn-primary btn-sm">Upgrade Now</button>
+        <form th:action="@{/payment/create-checkout-session}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button class="btn btn-primary btn-sm">Upgrade Now</button>
+        </form>
+
     </div>
 </div>
 

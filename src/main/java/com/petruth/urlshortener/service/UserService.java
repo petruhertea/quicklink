@@ -9,4 +9,5 @@ public interface UserService {
     Optional<User> findByEmail(String email);
     Optional<UserOAuthProvider> findByOauthProviderAndOauthId(String provider, String oauthId);
     User save(User user);
+    Optional<User> findById(Long id);
 }
