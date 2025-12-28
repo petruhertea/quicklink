@@ -56,4 +56,9 @@ public class ShortenedUrlServiceImpl implements ShortenedUrlService{
     public List<ShortenedUrl> findByUser(User user){
         return shortenedUrlRepository.findByUser(user).orElseThrow(()->new RuntimeException("URLs not found"));
     }
+
+    @Override
+    public boolean existsByCode(String code) {
+        return shortenedUrlRepository.existsByCode(code);
+    }
 }

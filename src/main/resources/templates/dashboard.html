@@ -1,341 +1,463 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - QuickLink</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <style>
-        body {
-            background: #f8f9fa;
-        }
-        .navbar {
-            background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .stats-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        .stats-card h3 {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #667eea;
-            margin: 0;
-        }
-        .stats-card p {
-            color: #6c757d;
-            margin: 0;
-        }
-        .url-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: all 0.3s;
-        }
-        .url-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-        .url-code {
-            font-family: monospace;
-            background: #f8f9fa;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-weight: bold;
-            color: #667eea;
-        }
-        .click-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-        .btn-copy {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-        }
-        .btn-copy:hover {
-            background: #e9ecef;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #6c757d;
-        }
-        .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-        .user-profile-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 12px;
-            border-radius: 25px;
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            text-decoration: none;
-            color: #212529;
-            transition: all 0.3s;
-        }
-        .user-profile-btn:hover {
-            background: white;
-            border-color: #667eea;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
-        }
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 2px solid white;
-            object-fit: cover;
-        }
-        .user-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-        .dropdown-menu {
-            min-width: 250px;
-            border-radius: 12px;
-            border: none;
-            padding: 0.5rem;
-        }
-        .dropdown-item {
-            border-radius: 8px;
-            padding: 0.6rem 1rem;
-            transition: all 0.2s;
-        }
-        .dropdown-item:hover {
-            background: #f8f9fa;
-        }
-        .dropdown-header {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #e9ecef;
-        }
+      body {
+        background: #f8f9fa;
+      }
+      .navbar {
+        background: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .stats-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .stats-card h3 {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #667eea;
+        margin: 0;
+      }
+      .stats-card p {
+        color: #6c757d;
+        margin: 0;
+      }
+      .url-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s;
+      }
+      .url-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+      .url-code {
+        font-family: monospace;
+        background: #f8f9fa;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        color: #667eea;
+      }
+      .click-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+      }
+      .btn-copy {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+      }
+      .btn-copy:hover {
+        background: #e9ecef;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+      }
+      .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+      .user-profile-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 12px;
+        border-radius: 25px;
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        text-decoration: none;
+        color: #212529;
+        transition: all 0.3s;
+      }
+      .user-profile-btn:hover {
+        background: white;
+        border-color: #667eea;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+      }
+      .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid white;
+        object-fit: cover;
+      }
+      .user-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .dropdown-menu {
+        min-width: 250px;
+        border-radius: 12px;
+        border: none;
+        padding: 0.5rem;
+      }
+      .dropdown-item {
+        border-radius: 8px;
+        padding: 0.6rem 1rem;
+        transition: all 0.2s;
+      }
+      .dropdown-item:hover {
+        background: #f8f9fa;
+      }
+      .dropdown-header {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e9ecef;
+      }
     </style>
-</head>
-<body>
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light">
-    <div class="container">
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
         <a class="navbar-brand fw-bold" href="/">
-            <span style="color: #667eea;">Quick</span><span style="color: #764ba2;">Link</span>
+          <span style="color: #667eea">Quick</span
+          ><span style="color: #764ba2">Link</span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/subscription">Subscription</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active fw-bold" href="/dashboard">Dashboard</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle user-profile"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <img
+                  th:src="${user.profilePicture}"
+                  alt="Profile"
+                  class="user-avatar"
+                />
+                <span th:text="${user.name}">User</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="dropdown-item">Logout</button>
+                  </form>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link active fw-bold" href="/dashboard">Dashboard</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle user-profile" href="#" id="navbarDropdown"
-                       role="button" data-bs-toggle="dropdown">
-                        <img th:src="${user.profilePicture}" alt="Profile" class="user-avatar">
-                        <span th:text="${user.name}">User</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <form th:action="@{/logout}" method="post">
-                                <button type="submit" class="dropdown-item">Logout</button>
-                            </form>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+              </ul>
+            </li>
+          </ul>
         </div>
-    </div>
-</nav>
+      </div>
+    </nav>
 
-<!-- Main Content -->
-<div class="container mt-4">
-    <!-- Welcome Header -->
-    <div class="mb-4">
-        <h2 class="fw-bold">Welcome back, <span th:text="${user.name}">User</span>! 👋</h2>
+    <!-- Main Content -->
+    <div class="container mt-4">
+      <!-- Welcome Header -->
+      <div class="mb-4">
+        <h2 class="fw-bold">
+          Welcome back, <span th:text="${user.name}">User</span>! 👋
+        </h2>
         <p class="text-muted">Here's an overview of your shortened links</p>
-    </div>
+      </div>
 
-    <!-- Stats Row -->
-    <div class="row mb-4">
+      <!-- Stats Row -->
+      <div class="row mb-4">
         <div class="col-md-4">
-            <div class="stats-card">
-                <h3 th:text="${stats.totalLinks}">0</h3>
-                <p>Total Links</p>
-            </div>
+          <div class="stats-card">
+            <h3 th:text="${stats.totalLinks}">0</h3>
+            <p>Total Links</p>
+          </div>
         </div>
         <div class="col-md-4">
-            <div class="stats-card">
-                <h3 th:text="${stats.totalClicks}">0</h3>
-                <p>Total Clicks</p>
-            </div>
+          <div class="stats-card">
+            <h3 th:text="${stats.totalClicks}">0</h3>
+            <p>Total Clicks</p>
+          </div>
         </div>
         <div class="col-md-4">
-            <div class="stats-card">
-                <h3 th:text="${stats.clicksToday}">0</h3>
-                <p>Clicks Today</p>
-            </div>
+          <div class="stats-card">
+            <h3 th:text="${stats.clicksToday}">0</h3>
+            <p>Clicks Today</p>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- Quick Shorten Section -->
-    <div class="card mb-4">
+      <!-- Quick Shorten Section -->
+      <div class="card mb-4">
         <div class="card-body">
-            <h5 class="card-title mb-3">Create New Short Link</h5>
-            <form id="quickShortenForm">
-                <div class="input-group">
-                    <input
-                            type="url"
-                            class="form-control"
-                            id="quickUrlInput"
-                            placeholder="Paste your long URL here..."
-                            required>
-                    <button class="btn btn-primary" type="submit">Shorten</button>
-                </div>
-            </form>
-            <div id="quickResultBox" class="mt-3" style="display: none;">
-                <div class="alert alert-success">
-                    <strong>Success!</strong> Your link has been created.
-                </div>
+          <h5 class="card-title mb-3">Create New Short Link</h5>
+          <form id="quickShortenForm">
+            <div class="input-group mb-3">
+              <input
+                type="url"
+                class="form-control"
+                id="quickUrlInput"
+                placeholder="Paste your long URL here..."
+                required
+              />
+              <select
+                class="form-select"
+                id="quickExpirationDays"
+                style="max-width: 150px"
+              >
+                <option value="">No expiry</option>
+                <option value="7">7 days</option>
+                <option value="30">30 days</option>
+                <option value="90">90 days</option>
+              </select>
+              <button class="btn btn-primary" type="submit">Shorten</button>
             </div>
-        </div>
-    </div>
 
-    <!-- Links List -->
-    <div class="card">
+            <!-- Custom Code Input (Premium Only) -->
+            <div th:if="${user.premium}" class="mb-3">
+              <label class="form-label">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  class="bi bi-star-fill"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"
+                  />
+                </svg>
+                Custom Short Code (Premium)
+              </label>
+              <div class="input-group">
+                <span
+                  class="input-group-text"
+                  th:text="${'http://localhost:8080/api/'}"
+                  >http://localhost:8080/api/</span
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="quickCustomCode"
+                  placeholder="my-custom-link"
+                  pattern="[a-zA-Z0-9_-]+"
+                  maxlength="20"
+                  minlength="3"
+                />
+              </div>
+              <small class="text-muted"
+                >Leave empty for random code. Only letters, numbers, hyphens and
+                underscores.</small
+              >
+            </div>
+          </form>
+          <div id="quickResultBox" class="mt-3" style="display: none">
+            <div class="alert alert-success">
+              <strong>Success!</strong> Your link has been created.
+            </div>
+          </div>
+          <div
+            id="quickErrorBox"
+            class="mt-3 alert alert-danger"
+            style="display: none"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Links List -->
+      <div class="card">
         <div class="card-header bg-white">
-            <h5 class="mb-0">Your Links</h5>
+          <h5 class="mb-0">Your Links</h5>
         </div>
         <div class="card-body p-0">
-            <!-- Empty State -->
-            <div th:if="${#lists.isEmpty(urls)}" class="empty-state">
-                <div class="empty-state-icon">🔗</div>
-                <h4>No links yet</h4>
-                <p>Create your first shortened link above to get started!</p>
-            </div>
+          <!-- Empty State -->
+          <div th:if="${#lists.isEmpty(urls)}" class="empty-state">
+            <div class="empty-state-icon">🔗</div>
+            <h4>No links yet</h4>
+            <p>Create your first shortened link above to get started!</p>
+          </div>
 
-            <!-- Links List -->
-            <div th:if="${!#lists.isEmpty(urls)}">
-                <div th:each="url : ${urls}" class="url-card">
-                    <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <div class="mb-2">
-                                <span class="url-code" th:text="${url.code}">abc123</span>
-                                <span class="click-badge ms-2">
-                                        <span th:text="${url.clickCount}">0</span> clicks
-                                    </span>
-                            </div>
-                            <div class="text-truncate text-muted small">
-                                <strong>Original:</strong>
-                                <a th:href="${url.longUrl}"
-                                   th:text="${url.longUrl}"
-                                   target="_blank"
-                                   class="text-decoration-none">
-                                    https://example.com/very/long/url
-                                </a>
-                            </div>
-                            <div class="text-muted small mt-1">
-                                <strong>Created:</strong>
-                                <span th:text="${#temporals.format(url.dateCreated, 'MMM dd, yyyy HH:mm')}">
-                                        Jan 01, 2024 12:00
-                                    </span>
-                                <span th:if="${url.lastAccessed}">
-                                        | <strong>Last accessed:</strong>
-                                        <span th:text="${#temporals.format(url.lastAccessed, 'MMM dd, yyyy HH:mm')}">
-                                            Jan 01, 2024 12:00
-                                        </span>
-                                    </span>
-                            </div>
-                        </div>
-                        <div class="col-md-6 text-end">
-                            <div class="input-group">
-                                <input
-                                        type="text"
-                                        class="form-control short-url-input"
-                                        th:value="${url.shortUrl}"
-                                        readonly>
-                                <button
-                                        class="btn btn-copy copy-link-btn"
-                                        type="button"
-                                        th:data-url="${url.shortUrl}">
-                                    📋 Copy
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+          <!-- Links List -->
+          <div th:if="${!#lists.isEmpty(urls)}">
+            <div th:each="url : ${urls}" class="url-card">
+              <div class="row align-items-center">
+                <div class="col-md-6">
+                  <div class="mb-2">
+                    <span class="url-code" th:text="${url.code}">abc123</span>
+                    <span class="click-badge ms-2">
+                      <span th:text="${url.clickCount}">0</span> clicks
+                    </span>
+                  </div>
+                  <div class="text-truncate text-muted small">
+                    <strong>Original:</strong>
+                    <a
+                      th:href="${url.longUrl}"
+                      th:text="${url.longUrl}"
+                      target="_blank"
+                      class="text-decoration-none"
+                    >
+                      https://example.com/very/long/url
+                    </a>
+                  </div>
+                  <div class="text-muted small mt-1">
+                    <strong>Created:</strong>
+                    <span
+                      th:text="${#temporals.format(url.dateCreated, 'MMM dd, yyyy HH:mm')}"
+                    >
+                      Jan 01, 2024 12:00
+                    </span>
+                    <span th:if="${url.lastAccessed}">
+                      | <strong>Last accessed:</strong>
+                      <span
+                        th:text="${#temporals.format(url.lastAccessed, 'MMM dd, yyyy HH:mm')}"
+                      >
+                        Jan 01, 2024 12:00
+                      </span>
+                    </span>
+                  </div>
                 </div>
+                <div class="col-md-6 text-end">
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      class="form-control short-url-input"
+                      th:value="${url.shortUrl}"
+                      readonly
+                    />
+                    <button
+                      class="btn btn-copy copy-link-btn"
+                      type="button"
+                      th:data-url="${url.shortUrl}"
+                    >
+                      📋 Copy
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- Premium Callout (if not premium) -->
-    <div th:if="${!user.premium}" class="alert alert-info mt-4">
+      <!-- Premium Callout (if not premium) -->
+      <div th:if="${!user.premium}" class="alert alert-info mt-4">
         <h5>🚀 Upgrade to Premium</h5>
-        <p class="mb-2">Get advanced analytics, custom domains, and remove ads for just $5/month</p>
+        <p class="mb-2">
+          Get advanced analytics, custom domains, and remove ads for just
+          $5/month
+        </p>
         <form th:action="@{/payment/create-checkout-session}" method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <button class="btn btn-primary btn-sm">Upgrade Now</button>
+          <input
+            type="hidden"
+            th:name="${_csrf.parameterName}"
+            th:value="${_csrf.token}"
+          />
+          <button class="btn btn-primary btn-sm">Upgrade Now</button>
         </form>
-
+      </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Quick shorten form
-    document.getElementById('quickShortenForm')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Quick shorten form
+      document
+        .getElementById("quickShortenForm")
+        ?.addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-        const urlInput = document.getElementById('quickUrlInput');
-        const resultBox = document.getElementById('quickResultBox');
+          const urlInput = document.getElementById("quickUrlInput");
+          const expirationDays = document.getElementById("quickExpirationDays");
+          const customCode = document.getElementById("quickCustomCode");
+          const resultBox = document.getElementById("quickResultBox");
+          const errorBox = document.getElementById("quickErrorBox");
 
-        try {
-            const response = await fetch('/api/shorten', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ url: urlInput.value })
+          // Hide previous messages
+          resultBox.style.display = "none";
+          errorBox.style.display = "none";
+
+          const requestBody = {
+            url: urlInput.value,
+          };
+
+          if (expirationDays && expirationDays.value) {
+            requestBody.expirationDays = parseInt(expirationDays.value);
+          }
+
+          if (customCode && customCode.value.trim()) {
+            requestBody.customCode = customCode.value.trim();
+          }
+
+          try {
+            const response = await fetch("/api/shorten", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(requestBody),
             });
 
             if (response.ok) {
-                resultBox.style.display = 'block';
-                urlInput.value = '';
+              resultBox.style.display = "block";
+              urlInput.value = "";
+              if (customCode) customCode.value = "";
 
-                // Reload page after 1 second to show new link
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
+              // Reload page after 1 second to show new link
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
+            } else {
+              const error = await response.json();
+              errorBox.textContent = error.error || "Failed to shorten URL";
+              errorBox.style.display = "block";
             }
-        } catch (error) {
-            alert('Failed to shorten URL. Please try again.');
-        }
-    });
-
-    // Copy buttons
-    document.querySelectorAll('.copy-link-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const url = this.getAttribute('data-url');
-            navigator.clipboard.writeText(url);
-
-            const originalText = this.textContent;
-            this.textContent = '✓ Copied!';
-            setTimeout(() => {
-                this.textContent = originalText;
-            }, 2000);
+          } catch (error) {
+            errorBox.textContent = "Failed to shorten URL. Please try again.";
+            errorBox.style.display = "block";
+          }
         });
-    });
-</script>
-</body>
+
+      // Copy buttons
+      document.querySelectorAll(".copy-link-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          const url = this.getAttribute("data-url");
+          navigator.clipboard.writeText(url);
+
+          const originalText = this.textContent;
+          this.textContent = "✓ Copied!";
+          setTimeout(() => {
+            this.textContent = originalText;
+          }, 2000);
+        });
+      });
+    </script>
+  </body>
 </html>

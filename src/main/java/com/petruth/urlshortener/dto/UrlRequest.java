@@ -16,5 +16,9 @@ public record UrlRequest(
 
         @Min(value = 0, message = "Expiration days must be 0 or positive")
         @Max(value = 365, message = "Expiration days cannot exceed 365")
-        Integer expirationDays  // null = never expires, 0 = expires immediately (testing), 1-365 = days
+        Integer expirationDays,
+
+        @Pattern(regexp = "^[a-zA-Z0-9_-]*$", message = "Custom code can only contain letters, numbers, hyphens and underscores")
+        @Size(min = 3, max = 20, message = "Custom code must be between 3 and 20 characters")
+        String customCode  // Only for premium users
 ) {}

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Subscription - QuickLink</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: #f8f9fa;
+      }
+      .navbar {
+        background: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .subscription-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+      .premium-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        color: #333;
+        padding: 0.5rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+      .feature-list {
+        list-style: none;
+        padding: 0;
+      }
+      .feature-list li {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e9ecef;
+      }
+      .feature-list li:last-child {
+        border-bottom: none;
+      }
+      .feature-icon {
+        color: #4caf50;
+        margin-right: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+          <span style="color: #667eea">Quick</span
+          ><span style="color: #764ba2">Link</span>
+        </a>
+        <div class="ms-auto">
+          <a href="/dashboard" class="btn btn-outline-primary"
+            >← Back to Dashboard</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <!-- Premium Status -->
+          <div th:if="${user.premium}" class="subscription-card">
+            <div class="text-center mb-4">
+              <div class="premium-badge">⭐ PREMIUM MEMBER</div>
+              <h2 class="mb-2">Your Premium Subscription</h2>
+              <p class="text-muted">You're enjoying all premium features</p>
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="text-center p-3 bg-light rounded">
+                  <h4 class="text-primary mb-1">$5.00</h4>
+                  <small class="text-muted">per month</small>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-center p-3 bg-light rounded">
+                  <h4 class="text-success mb-1">Active</h4>
+                  <small class="text-muted">Auto-renews monthly</small>
+                </div>
+              </div>
+            </div>
+
+            <h5 class="mb-3">Your Premium Benefits</h5>
+            <ul class="feature-list">
+              <li>
+                <span class="feature-icon">✓</span>
+                <strong>No Advertisements</strong> - Clean, distraction-free
+                experience
+              </li>
+              <li>
+                <span class="feature-icon">✓</span>
+                <strong>Custom Short Codes</strong> - Create memorable, branded
+                URLs
+              </li>
+              <li>
+                <span class="feature-icon">✓</span>
+                <strong>Advanced Analytics</strong> - Detailed insights and
+                click tracking
+              </li>
+              <li>
+                <span class="feature-icon">✓</span>
+                <strong>Higher Rate Limits</strong> - Up to 500 links per hour
+              </li>
+              <li>
+                <span class="feature-icon">✓</span>
+                <strong>Priority Support</strong> - Get help when you need it
+                most
+              </li>
+              <li>
+                <span class="feature-icon">✓</span>
+                <strong>Link Expiration</strong> - Set custom expiration dates
+              </li>
+            </ul>
+
+            <div class="alert alert-info mt-4">
+              <h6 class="mb-2">📊 Usage Statistics</h6>
+              <div class="row text-center">
+                <div class="col-4">
+                  <strong th:text="${stats.totalLinks}">0</strong>
+                  <br /><small class="text-muted">Total Links</small>
+                </div>
+                <div class="col-4">
+                  <strong th:text="${stats.totalClicks}">0</strong>
+                  <br /><small class="text-muted">Total Clicks</small>
+                </div>
+                <div class="col-4">
+                  <strong>500/hr</strong>
+                  <br /><small class="text-muted">Rate Limit</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-center mt-4">
+              <p class="text-muted small">
+                Need to manage your subscription? Visit your
+                <a
+                  href="https://billing.stripe.com/p/login/test_your_portal_link"
+                  target="_blank"
+                  >Stripe Customer Portal</a
+                >
+              </p>
+              <small class="text-muted"
+                >You can update payment methods or cancel your subscription
+                anytime</small
+              >
+            </div>
+          </div>
+
+          <!-- Free Tier -->
+          <div th:if="${!user.premium}" class="subscription-card">
+            <div class="text-center mb-4">
+              <h2 class="mb-2">You're on the Free Plan</h2>
+              <p class="text-muted">
+                Upgrade to Premium to unlock powerful features
+              </p>
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title">Free Plan</h5>
+                    <h3 class="mb-3">
+                      $0<small class="text-muted">/month</small>
+                    </h3>
+                    <ul class="list-unstyled">
+                      <li class="mb-2">✓ Basic URL shortening</li>
+                      <li class="mb-2">✓ Click tracking</li>
+                      <li class="mb-2">✓ 50 links per hour</li>
+                      <li class="mb-2 text-muted">✗ Custom codes</li>
+                      <li class="mb-2 text-muted">✗ Advanced analytics</li>
+                      <li class="mb-2 text-muted">✗ Ad-free experience</li>
+                    </ul>
+                    <p class="text-muted small">Current Plan</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card h-100 border-primary">
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-center mb-2"
+                    >
+                      <h5 class="card-title mb-0">Premium Plan</h5>
+                      <span class="badge bg-warning text-dark">POPULAR</span>
+                    </div>
+                    <h3 class="mb-3">
+                      $5<small class="text-muted">/month</small>
+                    </h3>
+                    <ul class="list-unstyled">
+                      <li class="mb-2 text-success">✓ Everything in Free</li>
+                      <li class="mb-2 text-success">✓ Custom short codes</li>
+                      <li class="mb-2 text-success">✓ 500 links per hour</li>
+                      <li class="mb-2 text-success">✓ Advanced analytics</li>
+                      <li class="mb-2 text-success">✓ No advertisements</li>
+                      <li class="mb-2 text-success">✓ Priority support</li>
+                    </ul>
+                    <form
+                      action="/payment/create-checkout-session"
+                      method="post"
+                    >
+                      <button type="submit" class="btn btn-primary w-100">
+                        Upgrade Now
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert alert-light">
+              <h6 class="mb-2">📊 Your Current Usage</h6>
+              <div class="row text-center">
+                <div class="col-4">
+                  <strong th:text="${stats.totalLinks}">0</strong>
+                  <br /><small class="text-muted">Total Links</small>
+                </div>
+                <div class="col-4">
+                  <strong th:text="${stats.totalClicks}">0</strong>
+                  <br /><small class="text-muted">Total Clicks</small>
+                </div>
+                <div class="col-4">
+                  <strong>50/hr</strong>
+                  <br /><small class="text-muted">Rate Limit</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FAQ -->
+          <div class="subscription-card">
+            <h4 class="mb-4">Frequently Asked Questions</h4>
+
+            <div class="mb-3">
+              <h6>Can I cancel anytime?</h6>
+              <p class="text-muted mb-0">
+                Yes! You can cancel your subscription at any time through the
+                Stripe Customer Portal. Your premium features will remain active
+                until the end of your billing period.
+              </p>
+            </div>
+
+            <div class="mb-3">
+              <h6>What happens to my links if I cancel?</h6>
+              <p class="text-muted mb-0">
+                Your shortened links will continue to work forever. You'll just
+                lose access to premium features like custom codes and advanced
+                analytics.
+              </p>
+            </div>
+
+            <div class="mb-3">
+              <h6>Can I upgrade or downgrade my plan?</h6>
+              <p class="text-muted mb-0">
+                You can upgrade to Premium anytime. To cancel Premium, visit the
+                Stripe Customer Portal.
+              </p>
+            </div>
+
+            <div class="mb-3">
+              <h6>Do you offer refunds?</h6>
+              <p class="text-muted mb-0">
+                We offer a 30-day money-back guarantee. If you're not satisfied,
+                contact support for a full refund.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

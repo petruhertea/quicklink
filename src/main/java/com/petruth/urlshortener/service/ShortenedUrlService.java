@@ -10,4 +10,5 @@ public interface ShortenedUrlService {
     ShortenedUrl save(ShortenedUrl shortenedUrl);
     ShortenedUrl findByCode(String code);
     List<ShortenedUrl> findByUser(User user);
+    boolean existsByCode(String code);
 }

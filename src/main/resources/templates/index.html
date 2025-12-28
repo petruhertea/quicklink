@@ -84,6 +84,9 @@
             <li class="nav-item" sec:authorize="isAuthenticated()">
               <a class="nav-link" href="/dashboard">Dashboard</a>
             </li>
+            <li class="nav-item" sec:authorize="isAuthenticated()">
+              <a class="nav-link" href="/subscription">Subscription</a>
+            </li>
             <li class="nav-item" sec:authorize="!isAuthenticated()">
               <a class="nav-link btn btn-outline-primary px-3" href="/login"
                 >Sign In</a
@@ -119,7 +122,6 @@
               </div>
 
               <!-- URL Shortening Form -->
-              <!-- URL Shortening Form -->
               <form id="shortenForm">
                 <div class="input-group input-group-lg mb-3">
                   <input
@@ -145,6 +147,42 @@
                   </select>
                   <small class="text-muted"
                     >Choose when this link should stop working</small
+                  >
+                </div>
+                <div
+                  sec:authorize="isAuthenticated()"
+                  th:if="${user != null and user.premium}"
+                  class="mb-3"
+                >
+                  <label class="form-label">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      class="bi bi-star-fill"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"
+                      />
+                    </svg>
+                    Custom Short Code (Premium)
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">localhost:8080/api/</span>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="customCode"
+                      placeholder="my-link"
+                      pattern="[a-zA-Z0-9_-]+"
+                      maxlength="20"
+                      minlength="3"
+                    />
+                  </div>
+                  <small class="text-muted"
+                    >Optional: Create a memorable custom code</small
                   >
                 </div>
               </form>
@@ -225,6 +263,7 @@
 
           const urlInput = document.getElementById("urlInput");
           const expirationDays = document.getElementById("expirationDays");
+          const customCode = document.getElementById("customCode");
           const errorMessage = document.getElementById("errorMessage");
           const resultBox = document.getElementById("resultBox");
           const shortUrlInput = document.getElementById("shortUrl");
@@ -242,6 +281,11 @@
             requestBody.expirationDays = parseInt(expirationDays.value);
           }
 
+          // Add custom code if provided
+          if (customCode && customCode.value.trim()) {
+            requestBody.customCode = customCode.value.trim();
+          }
+
           try {
             const response = await fetch("/api/shorten", {
               method: "POST",
@@ -255,6 +299,11 @@
               const data = await response.json();
               shortUrlInput.value = data.shortUrl;
               resultBox.style.display = "block";
+
+              // Clear custom code input if it exists
+              if (customCode) {
+                customCode.value = "";
+              }
             } else {
               const error = await response.json();
               errorMessage.textContent =

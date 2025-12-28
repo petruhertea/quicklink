@@ -25,7 +25,7 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/", "/api/shorten", "/api/{code}", "/login", "/css/**", "/js/**", "/error", "/payment/webhook").permitAll();
-                    auth.requestMatchers("/dashboard/**", "/actuator/**", "/payment/**").authenticated();
+                    auth.requestMatchers("/dashboard/**", "/subscription", "/actuator/**", "/payment/**").authenticated();
                     auth.anyRequest().authenticated();
                 })
                 .oauth2Login(oauth2 -> oauth2
