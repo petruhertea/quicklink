@@ -4,9 +4,11 @@ import com.petruth.urlshortener.dto.UrlRequest;
 import com.petruth.urlshortener.entity.ShortenedUrl;
 import com.petruth.urlshortener.entity.User;
 import com.petruth.urlshortener.entity.UserOAuthProvider;
+import com.petruth.urlshortener.service.AnalyticsService;
 import com.petruth.urlshortener.service.ShortenedUrlServiceImpl;
 import com.petruth.urlshortener.service.UrlSafetyService;
 import com.petruth.urlshortener.service.UserServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +31,16 @@ public class ShortenUrlController {
     private final ShortenedUrlServiceImpl shortenedUrlService;
     private final UserServiceImpl userService;
     private final UrlSafetyService urlSafetyService;
+    private final AnalyticsService analyticsService;
 
     ShortenUrlController(ShortenedUrlServiceImpl shortenedUrlService,
                          UserServiceImpl userService,
-                         UrlSafetyService urlSafetyService) {
+                         UrlSafetyService urlSafetyService,
+                         AnalyticsService analyticsService) {
         this.shortenedUrlService = shortenedUrlService;
         this.userService = userService;
         this.urlSafetyService = urlSafetyService;
+        this.analyticsService = analyticsService;
     }
 
     @PostMapping("/shorten")
@@ -129,7 +134,7 @@ public class ShortenUrlController {
     }
 
     @GetMapping("/{code}")
-    public ResponseEntity<?> redirectToLongUrl(@PathVariable String code) {
+    public ResponseEntity<?> redirectToLongUrl(@PathVariable String code, HttpServletRequest request) {
         ShortenedUrl shortenedUrl = shortenedUrlService.findByCode(code);
 
         if (shortenedUrl == null) {
@@ -143,14 +148,59 @@ public class ShortenUrlController {
                     .body("<html><body><h1>410 - Link Expired</h1><p>This shortened link has expired and is no longer available.</p></body></html>");
         }
 
-        // Track analytics
+        // Track analytics (basic)
         shortenedUrl.setClickCount(shortenedUrl.getClickCount() + 1);
         shortenedUrl.setLastAccessed(LocalDateTime.now());
         shortenedUrlService.save(shortenedUrl);
 
+        // Record detailed analytics
+        analyticsService.recordClick(shortenedUrl, request);
+
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(shortenedUrl.getLongUrl()))
                 .build();
+    }
+
+    @GetMapping("/analytics/{code}")
+    public ResponseEntity<?> getAnalytics(
+            @PathVariable String code,
+            @RequestParam(defaultValue = "30") int days,
+            @AuthenticationPrincipal OAuth2User principal,
+            OAuth2AuthenticationToken authToken) {
+
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        ShortenedUrl url = shortenedUrlService.findByCode(code);
+        if (url == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Verify user owns this URL
+        String provider = authToken.getAuthorizedClientRegistrationId();
+        String oauthId;
+        if ("google".equals(provider)) {
+            oauthId = principal.getAttribute("sub");
+        } else if ("github".equals(provider)) {
+            Object idObj = principal.getAttribute("id");
+            oauthId = (idObj != null) ? idObj.toString() : null;
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        User user = userService.findByOAuth(provider, oauthId)
+                .map(oauthProvider -> oauthProvider.getUser())
+                .orElse(null);
+
+        if (user == null || !url.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        // Get analytics
+        Map<String, Object> analytics = analyticsService.getAnalyticsForUrl(url, days);
+
+        return ResponseEntity.ok(analytics);
     }
 
     public String getBaseUrl() {

@@ -126,6 +126,21 @@
         padding: 0.75rem 1rem;
         border-bottom: 1px solid #e9ecef;
       }
+      .navbar-nav .nav-link {
+        display: flex;
+        align-items: center;
+        height: 100%;
+      }
+
+      .user-avatar {
+        width: 36px;
+        height: 36px;
+        object-fit: cover;
+      }
+
+      .navbar .dropdown-toggle::after {
+        margin-left: 6px;
+      }
     </style>
   </head>
   <body>
@@ -145,19 +160,19 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
+          <ul class="navbar-nav ms-auto align-items-center">
             <li class="nav-item">
               <a class="nav-link" href="/">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/subscription">Subscription</a>
+              <a class="nav-link" href="/subscription">Subscription</a>
             </li>
             <li class="nav-item">
               <a class="nav-link active fw-bold" href="/dashboard">Dashboard</a>
             </li>
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown ms-3">
               <a
-                class="nav-link dropdown-toggle user-profile"
+                class="nav-link dropdown-toggle d-flex align-items-center gap-2"
                 href="#"
                 id="navbarDropdown"
                 role="button"
@@ -168,7 +183,7 @@
                   alt="Profile"
                   class="user-avatar"
                 />
-                <span th:text="${user.name}">User</span>
+                <span th:text="${user.name}" class="fw-semibold">User</span>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li>
@@ -361,6 +376,25 @@
                       📋 Copy
                     </button>
                   </div>
+                  <a
+                    th:href="@{/analytics/{code}(code=${url.code})}"
+                    class="btn btn-sm btn-outline-primary w-100"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      fill="currentColor"
+                      class="bi bi-graph-up"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07"
+                      />
+                    </svg>
+                    View Analytics
+                  </a>
                 </div>
               </div>
             </div>

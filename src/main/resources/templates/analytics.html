@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - QuickLink</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .analytics-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        .stat-box h3 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        .stat-box p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        .link-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .premium-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <span style="color: #667eea;">Quick</span><span style="color: #764ba2;">Link</span>
+        </a>
+        <div class="ms-auto">
+            <a href="/dashboard" class="btn btn-outline-primary">← Back to Dashboard</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <!-- Link Info Header -->
+    <div class="link-info">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h4 class="mb-2">
+                    <span class="badge bg-primary" th:text="${url.code}">ABC123</span>
+                    <span th:if="${user.premium}" class="premium-badge ms-2">PREMIUM</span>
+                </h4>
+                <p class="mb-1">
+                    <strong>Short URL:</strong>
+                    <a th:href="${url.shortUrl}" th:text="${url.shortUrl}" target="_blank">
+                        http://localhost:8080/api/ABC123
+                    </a>
+                </p>
+                <p class="mb-1 text-truncate">
+                    <strong>Original URL:</strong>
+                    <a th:href="${url.longUrl}" th:text="${url.longUrl}" target="_blank" class="text-muted">
+                        https://example.com/very/long/url
+                    </a>
+                </p>
+                <p class="mb-0 text-muted">
+                    <small>
+                        Created: <span th:text="${#temporals.format(url.dateCreated, 'MMM dd, yyyy HH:mm')}">Jan 01, 2024</span>
+                        <span th:if="${url.expiresAt}">
+                                | Expires: <span th:text="${#temporals.format(url.expiresAt, 'MMM dd, yyyy')}">Jan 01, 2025</span>
+                            </span>
+                    </small>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-box">
+                <h3 th:text="${url.clickCount}">0</h3>
+                <p>Total Clicks</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-box">
+                <h3 th:text="${stats.clicksToday}">0</h3>
+                <p>Clicks Today</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-box">
+                <h3 th:text="${stats.clicksThisWeek}">0</h3>
+                <p>Clicks This Week</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Time Period Selector -->
+    <div class="analytics-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Click History</h5>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="loadAnalytics(7)">7 Days</button>
+                <button type="button" class="btn btn-sm btn-outline-primary active" onclick="loadAnalytics(30)">30 Days</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="loadAnalytics(90)">90 Days</button>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="clicksChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Premium Analytics -->
+    <div th:if="${user.premium}">
+        <div class="row">
+            <!-- Device Breakdown -->
+            <div class="col-md-6">
+                <div class="analytics-card">
+                    <h5 class="mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-phone" viewBox="0 0 16 16">
+                            <path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+                            <path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
+                        </svg>
+                        Devices
+                    </h5>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="devicesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Browser Breakdown -->
+            <div class="col-md-6">
+                <div class="analytics-card">
+                    <h5 class="mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-browser-chrome" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M16 8a8 8 0 0 1-7.022 7.94l1.902-7.098a3 3 0 0 0 .05-1.492A3 3 0 0 0 10.237 6h5.511A8 8 0 0 1 16 8M0 8a8 8 0 0 0 7.927 8l1.426-5.321a3 3 0 0 1-.723.255 3 3 0 0 1-1.743-.147 3 3 0 0 1-1.043-.7L.633 4.876A8 8 0 0 0 0 8m5.004-.167L1.108 3.936A8.003 8.003 0 0 1 15.418 5H8.066a3 3 0 0 0-1.252.243 2.99 2.99 0 0 0-1.81 2.59M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                        </svg>
+                        Browsers
+                    </h5>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="browsersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Referrers Table -->
+        <div class="analytics-card">
+            <h5 class="mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16">
+                    <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                    <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+                </svg>
+                Top Referrers
+            </h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th class="text-end">Clicks</th>
+                        <th class="text-end">Percentage</th>
+                    </tr>
+                    </thead>
+                    <tbody id="referrersTable">
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">Loading...</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upgrade prompt for free users -->
+    <div th:if="${!user.premium}" class="analytics-card text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <h4 class="mb-3">🔒 Unlock Advanced Analytics</h4>
+        <p class="mb-4">Upgrade to Premium to access detailed insights including device breakdown, browser statistics, geographical data, and referrer tracking.</p>
+        <form action="/payment/create-checkout-session" method="post">
+            <button type="submit" class="btn btn-light btn-lg">
+                Upgrade to Premium - $5/month
+            </button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    const urlCode = /*[[${url.code}]]*/ '';
+    const isPremium = /*[[${user.premium}]]*/ false;
+
+    let clicksChart = null;
+    let devicesChart = null;
+    let browsersChart = null;
+
+    // Load analytics data
+    async function loadAnalytics(days = 30) {
+        try {
+            const response = await fetch(`/api/analytics/${urlCode}?days=${days}`);
+            const data = await response.json();
+
+            // Update clicks chart
+            updateClicksChart(data.dailyClicks);
+
+            if (isPremium) {
+                // Update device chart
+                updateDevicesChart(data.devices);
+
+                // Update browsers chart
+                updateBrowsersChart(data.browsers);
+
+                // Update referrers table
+                updateReferrersTable(data.referrers);
+            }
+
+            // Update active button
+            document.querySelectorAll('.btn-group button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        } catch (error) {
+            console.error('Error loading analytics:', error);
+        }
+    }
+
+    function updateClicksChart(data) {
+        const ctx = document.getElementById('clicksChart').getContext('2d');
+
+        if (clicksChart) {
+            clicksChart.destroy();
+        }
+
+        clicksChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(d => d.date),
+                datasets: [{
+                    label: 'Clicks',
+                    data: data.map(d => d.count),
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateDevicesChart(data) {
+        const ctx = document.getElementById('devicesChart').getContext('2d');
+
+        if (devicesChart) {
+            devicesChart.destroy();
+        }
+
+        devicesChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.map(d => d.label),
+                datasets: [{
+                    data: data.map(d => d.count),
+                    backgroundColor: [
+                        '#667eea',
+                        '#764ba2',
+                        '#f093fb',
+                        '#4facfe'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    function updateBrowsersChart(data) {
+        const ctx = document.getElementById('browsersChart').getContext('2d');
+
+        if (browsersChart) {
+            browsersChart.destroy();
+        }
+
+        browsersChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.label),
+                datasets: [{
+                    label: 'Clicks',
+                    data: data.map(d => d.count),
+                    backgroundColor: '#667eea'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateReferrersTable(data) {
+        const tbody = document.getElementById('referrersTable');
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No referrer data available</td></tr>';
+            return;
+        }
+
+        const total = data.reduce((sum, d) => sum + parseInt(d.count), 0);
+
+        tbody.innerHTML = data.slice(0, 10).map(d => `
+            <tr>
+                <td>${d.label}</td>
+                <td class="text-end"><strong>${d.count}</strong></td>
+                <td class="text-end">${((d.count / total) * 100).toFixed(1)}%</td>
+            </tr>
+        `).join('');
+    }
+
+    // Load initial data
+    loadAnalytics(30);
+</script>
+</body>
+</html>
