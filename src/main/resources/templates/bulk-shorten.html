@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Shorten - QuickLink</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .bulk-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .drop-zone {
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        .drop-zone:hover {
+            background: #e9ecef;
+            border-color: #764ba2;
+        }
+        .drop-zone.active {
+            background: #e7f3ff;
+            border-color: #667eea;
+        }
+        .results-table {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .success-row {
+            background: #d4edda;
+        }
+        .error-row {
+            background: #f8d7da;
+        }
+        .premium-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <span style="color: #667eea;">Quick</span><span style="color: #764ba2;">Link</span>
+        </a>
+        <div class="ms-auto">
+            <a href="/dashboard" class="btn btn-outline-primary">← Back to Dashboard</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="bulk-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h2 class="mb-2">Bulk URL Shortening</h2>
+                        <p class="text-muted mb-0">
+                            Shorten multiple URLs at once
+                            <span th:if="${user.premium}" class="premium-badge ms-2">PREMIUM</span>
+                        </p>
+                    </div>
+                    <div class="text-end">
+                        <div class="badge bg-primary fs-6">
+                            Limit: <span th:text="${user.premium ? '100' : '10'}">10</span> URLs
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${!user.premium}" class="alert alert-warning">
+                    <strong>Free Tier Limit:</strong> You can shorten up to 10 URLs at once.
+                    <a href="/subscription">Upgrade to Premium</a> for 100 URLs per batch and custom codes!
+                </div>
+            </div>
+
+            <!-- Input Methods -->
+            <div class="bulk-card">
+                <ul class="nav nav-tabs mb-4" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#paste-tab">
+                            📝 Paste URLs
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#csv-tab">
+                            📄 Upload CSV
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <!-- Paste URLs Tab -->
+                    <div class="tab-pane fade show active" id="paste-tab">
+                        <form id="pasteForm">
+                            <div class="mb-3">
+                                <label class="form-label">Paste URLs (one per line)</label>
+                                <textarea
+                                        class="form-control"
+                                        id="urlTextarea"
+                                        rows="10"
+                                        placeholder="https://example.com/page1
+https://example.com/page2
+https://example.com/page3"></textarea>
+                                <small class="text-muted">Enter one URL per line</small>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Expiration (Optional)</label>
+                                    <select class="form-select" id="bulkExpiration">
+                                        <option value="">Never expires</option>
+                                        <option value="1">1 day</option>
+                                        <option value="7">7 days</option>
+                                        <option value="30">30 days</option>
+                                        <option value="90">90 days</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg mt-3">
+                                Shorten All URLs
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- CSV Upload Tab -->
+                    <div class="tab-pane fade" id="csv-tab">
+                        <div class="drop-zone" id="dropZone">
+                            <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                            <div class="mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-file-earmark-arrow-up" viewBox="0 0 16 16">
+                                    <path d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707z"/>
+                                    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+                                </svg>
+                            </div>
+                            <h5>Drop CSV file here or click to upload</h5>
+                            <p class="text-muted">CSV should have columns: url, customCode (optional), expirationDays (optional)</p>
+                            <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('csvFile').click()">
+                                Choose File
+                            </button>
+                        </div>
+
+                        <div id="csvPreview" class="mt-3" style="display: none;">
+                            <h6>Preview:</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                    <tr>
+                                        <th>URL</th>
+                                        <th>Custom Code</th>
+                                        <th>Expiration (days)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="csvPreviewBody"></tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="btn btn-primary" id="processCsvBtn">
+                                Process CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress -->
+            <div id="progressCard" class="bulk-card" style="display: none;">
+                <h5>Processing...</h5>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                         id="progressBar"
+                         role="progressbar"
+                         style="width: 0%"></div>
+                </div>
+                <p class="text-muted mt-2 mb-0">
+                    <span id="progressText">Processing URLs...</span>
+                </p>
+            </div>
+
+            <!-- Results -->
+            <div id="resultsCard" class="bulk-card" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Results</h5>
+                    <div>
+                        <button class="btn btn-sm btn-success" id="downloadCsvBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                            </svg>
+                            Download CSV
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="window.location.reload()">
+                            New Batch
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h4 id="totalCount">0</h4>
+                                <p class="mb-0 text-muted">Total</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h4 id="successCount" class="text-success">0</h4>
+                                <p class="mb-0 text-muted">Successful</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h4 id="failedCount" class="text-danger">0</h4>
+                                <p class="mb-0 text-muted">Failed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-table">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Original URL</th>
+                            <th>Short URL</th>
+                            <th>Code</th>
+                            <th>Message</th>
+                        </tr>
+                        </thead>
+                        <tbody id="resultsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script th:inline="javascript">
+    const isPremium = /*[[${user.premium}]]*/ false;
+    const maxUrls = isPremium ? 100 : 10;
+    let csvData = [];
+
+    // Paste form submission
+    document.getElementById('pasteForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const textarea = document.getElementById('urlTextarea');
+        const expiration = document.getElementById('bulkExpiration').value;
+
+        const urls = textarea.value.split('\n')
+            .map(url => url.trim())
+            .filter(url => url.length > 0);
+
+        if (urls.length === 0) {
+            alert('Please enter at least one URL');
+            return;
+        }
+
+        if (urls.length > maxUrls) {
+            alert(`Maximum ${maxUrls} URLs allowed. ${isPremium ? '' : 'Upgrade to Premium for 100 URLs!'}`);
+            return;
+        }
+
+        const requestData = urls.map(url => ({
+            url: url,
+            customCode: null,
+            expirationDays: expiration ? parseInt(expiration) : null
+        }));
+
+        await processBulkUrls(requestData);
+    });
+
+    // CSV handling
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('csvFile');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('active');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('active');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('active');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFile(e.target.files[0]);
+        }
+    });
+
+    function handleFile(file) {
+        if (!file.name.endsWith('.csv')) {
+            alert('Please upload a CSV file');
+            return;
+        }
+
+        Papa.parse(file, {
+            header: true,
+            complete: function(results) {
+                csvData = results.data.filter(row => row.url && row.url.trim());
+
+                if (csvData.length === 0) {
+                    alert('No valid URLs found in CSV');
+                    return;
+                }
+
+                if (csvData.length > maxUrls) {
+                    alert(`CSV contains ${csvData.length} URLs. Maximum ${maxUrls} allowed.`);
+                    return;
+                }
+
+                displayCsvPreview(csvData);
+            }
+        });
+    }
+
+    function displayCsvPreview(data) {
+        const tbody = document.getElementById('csvPreviewBody');
+        tbody.innerHTML = data.slice(0, 5).map(row => `
+            <tr>
+                <td>${row.url}</td>
+                <td>${row.customCode || '-'}</td>
+                <td>${row.expirationDays || '-'}</td>
+            </tr>
+        `).join('');
+
+        if (data.length > 5) {
+            tbody.innerHTML += `<tr><td colspan="3" class="text-center text-muted">... and ${data.length - 5} more</td></tr>`;
+        }
+
+        document.getElementById('csvPreview').style.display = 'block';
+    }
+
+    document.getElementById('processCsvBtn').addEventListener('click', async () => {
+        const requestData = csvData.map(row => ({
+            url: row.url.trim(),
+            customCode: row.customCode || null,
+            expirationDays: row.expirationDays ? parseInt(row.expirationDays) : null
+        }));
+
+        await processBulkUrls(requestData);
+    });
+
+    async function processBulkUrls(urls) {
+        // Show progress
+        document.getElementById('progressCard').style.display = 'block';
+        document.getElementById('resultsCard').style.display = 'none';
+
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+
+        progressBar.style.width = '50%';
+        progressText.textContent = `Processing ${urls.length} URLs...`;
+
+        try {
+            const response = await fetch('/api/bulk-shorten', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ urls: urls })
+            });
+
+            progressBar.style.width = '100%';
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to process URLs');
+            }
+
+            const data = await response.json();
+            displayResults(data);
+
+        } catch (error) {
+            alert('Error: ' + error.message);
+            document.getElementById('progressCard').style.display = 'none';
+        }
+    }
+
+    function displayResults(data) {
+        document.getElementById('progressCard').style.display = 'none';
+        document.getElementById('resultsCard').style.display = 'block';
+
+        document.getElementById('totalCount').textContent = data.total;
+        document.getElementById('successCount').textContent = data.successful;
+        document.getElementById('failedCount').textContent = data.failed;
+
+        const tbody = document.getElementById('resultsTableBody');
+        tbody.innerHTML = data.results.map(result => `
+            <tr class="${result.success ? 'success-row' : 'error-row'}">
+                <td>
+                    ${result.success ?
+                        '<span class="badge bg-success">✓ Success</span>' :
+                        '<span class="badge bg-danger">✗ Failed</span>'}
+                </td>
+                <td class="text-truncate" style="max-width: 300px;">${result.originalUrl}</td>
+                <td>
+                    ${result.shortUrl ?
+                        `<a href="${result.shortUrl}" target="_blank">${result.shortUrl}</a>` :
+                        '-'}
+                </td>
+                <td>${result.code || '-'}</td>
+                <td>${result.error || '-'}</td>
+            </tr>
+        `).join('');
+
+        // Store results for CSV download
+        window.bulkResults = data.results;
+    }
+
+    // Download results as CSV
+    document.getElementById('downloadCsvBtn').addEventListener('click', () => {
+        if (!window.bulkResults) return;
+
+        const csvContent = [
+            ['Status', 'Original URL', 'Short URL', 'Code', 'Error'],
+            ...window.bulkResults.map(r => [
+                r.success ? 'Success' : 'Failed',
+                r.originalUrl,
+                r.shortUrl || '',
+                r.code || '',
+                r.error || ''
+            ])
+        ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'bulk-shorten-results.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    });
+</script>
+</body>
+</html>

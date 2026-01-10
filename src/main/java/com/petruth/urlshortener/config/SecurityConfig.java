@@ -46,7 +46,7 @@ public class SecurityConfig {
                         .maxSessionsPreventsLogin(false)
                 )
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**","/payment/**")
+                        .ignoringRequestMatchers("/api/**", "/payment/**")
                 )
                 .headers(headers -> headers
                         // Prevent clickjacking
@@ -56,16 +56,14 @@ public class SecurityConfig {
                                 .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
                         )
                         // Content Security Policy
-                        .contentSecurityPolicy(csp -> csp
-                                .policyDirectives(
-                                        "default-src 'self'; " +
-                                                "img-src 'self' https://lh3.googleusercontent.com https://avatars.githubusercontent.com data:; " +
-                                                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
-                                                "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
-                                                "font-src 'self' https://cdn.jsdelivr.net; " +
-                                                "connect-src 'self' https://cdn.jsdelivr.net"
-                                )
-                        )
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(
+                                "default-src 'self'; " +
+                                        "img-src 'self' https://lh3.googleusercontent.com https://avatars.githubusercontent.com data:; " +
+                                        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+                                        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
+                                        "font-src 'self' https://cdn.jsdelivr.net; " +
+                                        "connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com"
+                        ))
                 )
                 .build();
     }

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "shortened_url", indexes = {
@@ -36,17 +38,26 @@ public class ShortenedUrl {
     @JoinColumn(name = "user_id")
     private User user; // nullable for anonymous URLs
 
+    @OneToMany(
+            mappedBy = "shortenedUrl",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
+    private List<ClickAnalytics> analytics = new ArrayList<>();
+
     public ShortenedUrl(){}
 
-    public ShortenedUrl(Long id, String longUrl, String shortUrl, String code, LocalDateTime dateCreated, Long clickCount, LocalDateTime lastAccessed, User user) {
+    public ShortenedUrl(Long id, String longUrl, String shortUrl, String code, LocalDateTime dateCreated, LocalDateTime expiresAt, Long clickCount, LocalDateTime lastAccessed, User user, List<ClickAnalytics> analytics) {
         this.id = id;
         this.longUrl = longUrl;
         this.shortUrl = shortUrl;
         this.code = code;
         this.dateCreated = dateCreated;
+        this.expiresAt = expiresAt;
         this.clickCount = clickCount;
         this.lastAccessed = lastAccessed;
         this.user = user;
+        this.analytics = analytics;
     }
 
     public Long getId() {
@@ -119,5 +130,13 @@ public class ShortenedUrl {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<ClickAnalytics> getAnalytics() {
+        return analytics;
+    }
+
+    public void setAnalytics(List<ClickAnalytics> analytics) {
+        this.analytics = analytics;
     }
 }

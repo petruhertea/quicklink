@@ -61,4 +61,10 @@ public class ShortenedUrlServiceImpl implements ShortenedUrlService{
     public boolean existsByCode(String code) {
         return shortenedUrlRepository.existsByCode(code);
     }
+
+    @Override
+    @CacheEvict(allEntries = true)
+    public void delete(ShortenedUrl url) {
+        shortenedUrlRepository.delete(url);
+    }
 }

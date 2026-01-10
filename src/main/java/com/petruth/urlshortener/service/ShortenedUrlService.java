@@ -11,4 +11,5 @@ public interface ShortenedUrlService {
     ShortenedUrl findByCode(String code);
     List<ShortenedUrl> findByUser(User user);
     boolean existsByCode(String code);
+    void delete(ShortenedUrl url);
 }

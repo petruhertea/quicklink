@@ -78,6 +78,46 @@ public class WebController {
         return "login";
     }
 
+    @GetMapping("/bulk-shorten")
+    public String bulkShorten(@AuthenticationPrincipal OAuth2User principal,
+                              OAuth2AuthenticationToken authToken,
+                              Model model) {
+        if (principal == null) {
+            return "redirect:/";
+        }
+
+        // If user is authenticated, add user data to model
+        if (principal != null && authToken != null) {
+            try {
+                String provider = authToken.getAuthorizedClientRegistrationId();
+                String oauthId;
+
+                if ("google".equals(provider)) {
+                    oauthId = principal.getAttribute("sub");
+                } else if ("github".equals(provider)) {
+                    Object idObj = principal.getAttribute("id");
+                    oauthId = (idObj != null) ? idObj.toString() : null;
+                } else {
+                    oauthId = null;
+                }
+
+                if (oauthId != null) {
+                    UserOAuthProvider oauthProvider = userService.findByOAuth(provider, oauthId)
+                            .orElse(null);
+
+                    if (oauthProvider != null) {
+                        User user = oauthProvider.getUser();
+                        model.addAttribute("user", user);
+                    }
+                }
+            } catch (Exception e) {
+                // If there's any error, just don't add the user to the model
+                System.err.println("Error loading user for homepage: " + e.getMessage());
+            }
+        }
+        return "bulk-shorten";
+    }
+
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal OAuth2User principal, OAuth2AuthenticationToken authToken, Model model) {
         if (principal == null) {
