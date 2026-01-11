@@ -6,6 +6,10 @@ import com.petruth.urlshortener.entity.UserOAuthProvider;
 import com.petruth.urlshortener.repository.ClickAnalyticsRepository;
 import com.petruth.urlshortener.service.ShortenedUrlServiceImpl;
 import com.petruth.urlshortener.service.UserServiceImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
@@ -13,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,15 +37,13 @@ public class WebController {
                          ClickAnalyticsRepository clickAnalyticsRepository) {
         this.userService = userService;
         this.shortenedUrlService = shortenedUrlService;
-        this.clickAnalyticsRepository=clickAnalyticsRepository;
+        this.clickAnalyticsRepository = clickAnalyticsRepository;
     }
 
     @GetMapping("/")
     public String home(@AuthenticationPrincipal OAuth2User principal,
                        OAuth2AuthenticationToken authToken,
                        Model model) {
-
-        // If user is authenticated, add user data to model
         if (principal != null && authToken != null) {
             try {
                 String provider = authToken.getAuthorizedClientRegistrationId();
@@ -65,7 +68,6 @@ public class WebController {
                     }
                 }
             } catch (Exception e) {
-                // If there's any error, just don't add the user to the model
                 System.err.println("Error loading user for homepage: " + e.getMessage());
             }
         }
@@ -86,7 +88,6 @@ public class WebController {
             return "redirect:/";
         }
 
-        // If user is authenticated, add user data to model
         if (principal != null && authToken != null) {
             try {
                 String provider = authToken.getAuthorizedClientRegistrationId();
@@ -111,7 +112,6 @@ public class WebController {
                     }
                 }
             } catch (Exception e) {
-                // If there's any error, just don't add the user to the model
                 System.err.println("Error loading user for homepage: " + e.getMessage());
             }
         }
@@ -119,7 +119,17 @@ public class WebController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard(@AuthenticationPrincipal OAuth2User principal, OAuth2AuthenticationToken authToken, Model model) {
+    public String dashboard(
+            @AuthenticationPrincipal OAuth2User principal,
+            OAuth2AuthenticationToken authToken,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortDir,
+            @RequestParam(required = false) String filter,
+            Model model) {
+
         if (principal == null) {
             return "redirect:/";
         }
@@ -138,32 +148,58 @@ public class WebController {
         User user = userService.findByOAuth(provider, oauthId)
                 .orElseThrow(() -> new RuntimeException("User not found"))
                 .getUser();
-        // Get user's URLs
-        List<ShortenedUrl> urls = shortenedUrlService.findByUser(user);
 
-        // Calculate stats
+        // Build sort
+        Sort sort = Sort.by(
+                "desc".equalsIgnoreCase(sortDir) ? Sort.Direction.DESC : Sort.Direction.ASC,
+                sortBy != null && !sortBy.isEmpty() ? sortBy : "dateCreated"
+        );
+
+        // Build pageable
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Get paginated links with search/filter
+        Page<ShortenedUrl> urlPage;
+        if (search != null && !search.trim().isEmpty()) {
+            urlPage = shortenedUrlService.searchLinks(user, search.trim(), pageable);
+        } else if ("expired".equals(filter)) {
+            urlPage = shortenedUrlService.findExpiredLinks(user, pageable);
+        } else if ("active".equals(filter)) {
+            urlPage = shortenedUrlService.findActiveLinks(user, pageable);
+        } else {
+            urlPage = shortenedUrlService.findByUserPaginated(user, pageable);
+        }
+
+        // ===== FIX: Calculate stats with ALL required fields =====
         Map<String, Long> stats = new HashMap<>();
-        stats.put("totalLinks", (long) urls.size());
+        stats.put("totalLinks", shortenedUrlService.countUserLinks(user));
+        stats.put("activeLinks", shortenedUrlService.countActiveLinks(user));
+        stats.put("expiredLinks", shortenedUrlService.countExpiredLinks(user));
 
-        long totalClicks = urls.stream()
+        // Calculate total clicks from ALL user's links (not just current page)
+        List<ShortenedUrl> allUrls = shortenedUrlService.findByUser(user);
+        long totalClicks = allUrls.stream()
                 .mapToLong(url -> url.getClickCount() != null ? url.getClickCount() : 0)
                 .sum();
         stats.put("totalClicks", totalClicks);
 
-        // Count clicks today
+        // Count clicks today from ALL user's links
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-        long clicksToday = urls.stream()
+        long clicksToday = allUrls.stream()
                 .filter(url -> url.getLastAccessed() != null &&
                         url.getLastAccessed().isAfter(startOfDay))
                 .count();
         stats.put("clicksToday", clicksToday);
 
-        // Sort URLs by creation date (newest first)
-        urls.sort((a, b) -> b.getDateCreated().compareTo(a.getDateCreated()));
-
         model.addAttribute("user", user);
-        model.addAttribute("urls", urls);
+        model.addAttribute("urlPage", urlPage);
         model.addAttribute("stats", stats);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", urlPage.getTotalPages());
+        model.addAttribute("search", search);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("filter", filter);
 
         return "dashboard";
     }
@@ -199,7 +235,6 @@ public class WebController {
             return "redirect:/dashboard";
         }
 
-        // Calculate stats
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
         LocalDateTime startOfWeek = now.minusDays(7);
@@ -240,7 +275,6 @@ public class WebController {
 
         List<ShortenedUrl> urls = shortenedUrlService.findByUser(user);
 
-        // Calculate stats
         Map<String, Long> stats = new HashMap<>();
         stats.put("totalLinks", (long) urls.size());
 

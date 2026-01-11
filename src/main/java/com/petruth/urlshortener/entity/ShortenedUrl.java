@@ -15,12 +15,17 @@ public class ShortenedUrl {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "long_url", length = 2048)
+
+    // FIXED: Explicitly define column type to prevent bytea issue
+    @Column(name = "long_url", length = 2048, columnDefinition = "VARCHAR(2048)")
     private String longUrl;
-    @Column(name = "short_url", unique = true)
+
+    @Column(name = "short_url", unique = true, columnDefinition = "VARCHAR(255)")
     private String shortUrl;
-    @Column(name = "code", unique = true)
+
+    @Column(name = "code", unique = true, columnDefinition = "VARCHAR(255)")
     private String code;
+
     @CreationTimestamp
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
@@ -36,7 +41,7 @@ public class ShortenedUrl {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user; // nullable for anonymous URLs
+    private User user;
 
     @OneToMany(
             mappedBy = "shortenedUrl",
