@@ -4,6 +4,7 @@ import com.petruth.urlshortener.entity.ClickAnalytics;
 import com.petruth.urlshortener.entity.ShortenedUrl;
 import com.petruth.urlshortener.repository.ClickAnalyticsRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ public class AnalyticsService {
     public AnalyticsService(ClickAnalyticsRepository analyticsRepository) {
         this.analyticsRepository = analyticsRepository;
     }
-
+    @Async
     public void recordClick(ShortenedUrl url, HttpServletRequest request) {
         ClickAnalytics analytics = new ClickAnalytics();
         analytics.setShortenedUrl(url);

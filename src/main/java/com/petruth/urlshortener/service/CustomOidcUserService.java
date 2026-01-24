@@ -6,9 +6,12 @@ import com.petruth.urlshortener.repository.UserOAuthProviderRepository;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,13 +23,13 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+public class CustomOidcUserService extends OidcUserService {
 
     private final UserService userService;
     private final UserOAuthProviderRepository oauthProviderRepository;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public CustomOAuth2UserService(UserService userService,
+    public CustomOidcUserService(UserService userService,
                                    UserOAuthProviderRepository oauthProviderRepository) {
         this.userService = userService;
         this.oauthProviderRepository = oauthProviderRepository;
@@ -34,8 +37,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     @Transactional
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oauth2User = super.loadUser(userRequest);
+    public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
+        OidcUser oidcUser = super.loadUser(userRequest);
 
         String provider = userRequest.getClientRegistration().getRegistrationId();
 
@@ -46,39 +49,39 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String picture;
 
         if ("github".equals(provider)) {
-            Object idObj = oauth2User.getAttribute("id");
+            Object idObj = oidcUser.getAttribute("id");
             oauthId = (idObj != null) ? idObj.toString() : null;
 
-            email = oauth2User.getAttribute("email");
+            email = oidcUser.getAttribute("email");
 
             if (email == null || email.trim().isEmpty()) {
                 email = fetchGitHubEmail(userRequest);
             }
 
-            name = oauth2User.getAttribute("name");
+            name = oidcUser.getAttribute("name");
 
             if (name == null || name.trim().isEmpty()) {
-                name = oauth2User.getAttribute("login");
+                name = oidcUser.getAttribute("login");
             }
 
-            picture = oauth2User.getAttribute("avatar_url");
+            picture = oidcUser.getAttribute("avatar_url");
 
         } else if ("google".equals(provider)) {
-            oauthId = oauth2User.getAttribute("sub");
-            email = oauth2User.getAttribute("email");
-            name = oauth2User.getAttribute("name");
-            picture = oauth2User.getAttribute("picture");
+            oauthId = oidcUser.getAttribute("sub");
+            email = oidcUser.getAttribute("email");
+            name = oidcUser.getAttribute("name");
+            picture = oidcUser.getAttribute("picture");
 
         } else {
-            Object idAttribute = oauth2User.getAttribute("sub");
+            Object idAttribute = oidcUser.getAttribute("sub");
             if (idAttribute == null) {
-                idAttribute = oauth2User.getAttribute("id");
+                idAttribute = oidcUser.getAttribute("id");
             }
             oauthId = (idAttribute != null) ? idAttribute.toString() : null;
 
-            email = oauth2User.getAttribute("email");
-            name = oauth2User.getAttribute("name");
-            picture = oauth2User.getAttribute("picture");
+            email = oidcUser.getAttribute("email");
+            name = oidcUser.getAttribute("name");
+            picture = oidcUser.getAttribute("picture");
         }
 
         // Validation
@@ -152,7 +155,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userService.save(user);
         }
 
-        return oauth2User;
+        return oidcUser;
     }
 
     private String fetchGitHubEmail(OAuth2UserRequest userRequest) {

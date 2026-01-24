@@ -146,7 +146,8 @@ public class ShortenUrlController {
             shortenedUrl.setUser(user);
         }
 
-        shortenedUrlService.save(shortenedUrl);
+        // CHANGED: Use createNew() instead of save() for new URLs
+        shortenedUrlService.createNew(shortenedUrl);
 
         return ResponseEntity.ok(Map.of(
                 "shortUrl", shortenedUrl.getShortUrl(),
@@ -201,7 +202,7 @@ public class ShortenUrlController {
         int successful = 0;
         int failed = 0;
 
-        for (BulkUrlRequest.SingleUrlRequest urlReq : request.urls()) {
+        for (UrlRequest urlReq : request.urls()) {
             try {
                 // Validate URL
                 if (urlReq.url() == null || urlReq.url().trim().isEmpty()) {
@@ -258,7 +259,8 @@ public class ShortenUrlController {
                     shortenedUrl.setExpiresAt(LocalDateTime.now().plusDays(urlReq.expirationDays()));
                 }
 
-                shortenedUrlService.save(shortenedUrl);
+                // CHANGED: Use createNew() for bulk operations
+                shortenedUrlService.createNew(shortenedUrl);
 
                 results.add(new BulkUrlResponse.UrlResult(
                         urlReq.url(), shortenedUrl.getShortUrl(), code, true, null
@@ -281,9 +283,14 @@ public class ShortenUrlController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * OPTIMIZED: Redirect endpoint now uses direct SQL increment
+     * No more cache invalidation on every click!
+     */
     @GetMapping("/{code}")
     public ResponseEntity<?> redirectToLongUrl(@PathVariable String code, HttpServletRequest request) {
-        ShortenedUrl shortenedUrl = shortenedUrlService.findByCode(code);
+        // Use cached version for lookup
+        ShortenedUrl shortenedUrl = shortenedUrlService.findByCodeForRedirect(code);
 
         if (shortenedUrl == null) {
             return ResponseEntity.notFound().build();
@@ -296,12 +303,10 @@ public class ShortenUrlController {
                     .body("<html><body><h1>410 - Link Expired</h1><p>This shortened link has expired and is no longer available.</p></body></html>");
         }
 
-        // Track analytics (basic)
-        shortenedUrl.setClickCount(shortenedUrl.getClickCount() + 1);
-        shortenedUrl.setLastAccessed(LocalDateTime.now());
-        shortenedUrlService.save(shortenedUrl);
+        // OPTIMIZED: Use direct SQL update - doesn't invalidate cache
+        shortenedUrlService.incrementClickCount(code);
 
-        // Record detailed analytics
+        // Record detailed analytics (async recommended for production)
         analyticsService.recordClick(shortenedUrl, request);
 
         return ResponseEntity.status(HttpStatus.FOUND)

@@ -4,12 +4,16 @@ import com.petruth.urlshortener.dto.LinkSearchRequest;
 import com.petruth.urlshortener.entity.ShortenedUrl;
 import com.petruth.urlshortener.entity.User;
 import com.petruth.urlshortener.repository.ShortenedUrlRepository;
+import com.petruth.urlshortener.repository.ShortenedUrlSpecifications;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,15 +48,49 @@ public class ShortenedUrlServiceImpl implements ShortenedUrlService {
         return code;
     }
 
+    /**
+     * CHANGED: Use @CachePut instead of @CacheEvict for updates
+     * This updates the cache entry instead of clearing everything
+     */
     @Override
-    @CacheEvict(allEntries = true)
+    @CachePut(value = "urls", key = "#shortenedUrl.code")
     public ShortenedUrl save(ShortenedUrl shortenedUrl) {
+        return shortenedUrlRepository.save(shortenedUrl);
+    }
+
+    /**
+     * NEW: Special method for creating new URLs (clears cache)
+     */
+    @Override
+    @CacheEvict(value = "urls", allEntries = true)
+    public ShortenedUrl createNew(ShortenedUrl shortenedUrl) {
         return shortenedUrlRepository.save(shortenedUrl);
     }
 
     @Override
     @Cacheable(value = "urls", key = "#code")
     public ShortenedUrl findByCode(String code) {
+        return shortenedUrlRepository.findByCode(code)
+                .orElseThrow(() -> new RuntimeException("URL with code: " + code + " not found"));
+    }
+
+    /**
+     * NEW: Optimized method for incrementing clicks WITHOUT full entity update
+     * Uses direct SQL update - no cache invalidation needed
+     */
+    @Override
+    @Transactional
+    public void incrementClickCount(String code) {
+        shortenedUrlRepository.incrementClickCount(code, LocalDateTime.now());
+    }
+
+    /**
+     * NEW: Get URL for redirect (doesn't increment in service layer)
+     * Controller handles the increment separately
+     */
+    @Override
+    @Cacheable(value = "urls", key = "#code")
+    public ShortenedUrl findByCodeForRedirect(String code) {
         return shortenedUrlRepository.findByCode(code)
                 .orElseThrow(() -> new RuntimeException("URL with code: " + code + " not found"));
     }
@@ -68,67 +106,65 @@ public class ShortenedUrlServiceImpl implements ShortenedUrlService {
         return shortenedUrlRepository.existsByCode(code);
     }
 
+    /**
+     * CHANGED: Use @CacheEvict with specific key instead of allEntries
+     */
     @Override
-    @CacheEvict(allEntries = true)
+    @CacheEvict(value = "urls", key = "#url.code")
     public void delete(ShortenedUrl url) {
         shortenedUrlRepository.delete(url);
     }
 
-    // ===== PAGINATION & SEARCH IMPLEMENTATION =====
+    // ===== PAGINATION METHODS (No cache needed - these are queries) =====
 
     @Override
     public Page<ShortenedUrl> findByUserPaginated(User user, Pageable pageable) {
-        return shortenedUrlRepository.findByUser(user, pageable);
+        return shortenedUrlRepository.findAll(
+                ShortenedUrlSpecifications.belongsToUser(user),
+                pageable
+        );
     }
 
     @Override
     public Page<ShortenedUrl> searchLinks(User user, String searchTerm, Pageable pageable) {
-        if (searchTerm == null || searchTerm.trim().isEmpty()) {
-            return findByUserPaginated(user, pageable);
-        }
+        Specification<ShortenedUrl> spec = Specification
+                .where(ShortenedUrlSpecifications.belongsToUser(user))
+                .and(ShortenedUrlSpecifications.searchByTerm(searchTerm));
 
-        // Use the custom @Query method for combined search
-        return shortenedUrlRepository.searchByTerm(user, searchTerm, pageable);
+        return shortenedUrlRepository.findAll(spec, pageable);
     }
 
     @Override
     public Page<ShortenedUrl> advancedSearchLinks(User user, LinkSearchRequest request, Pageable pageable) {
-        // Use custom @Query for advanced search with multiple filters
-        return shortenedUrlRepository.advancedSearch(
+        Specification<ShortenedUrl> spec = ShortenedUrlSpecifications.advancedSearch(
                 user,
                 request.searchTerm(),
                 request.startDate(),
                 request.endDate(),
                 request.minClicks(),
                 request.maxClicks(),
-                pageable
+                request.expired()
         );
+
+        return shortenedUrlRepository.findAll(spec, pageable);
     }
 
     @Override
     public Page<ShortenedUrl> findExpiredLinks(User user, Pageable pageable) {
-        // Use JPA method name - finds links expired before now
-        return shortenedUrlRepository.findByUserAndExpiresAtBefore(user, LocalDateTime.now(), pageable);
+        Specification<ShortenedUrl> spec = Specification
+                .where(ShortenedUrlSpecifications.belongsToUser(user))
+                .and(ShortenedUrlSpecifications.expiredLinks());
+
+        return shortenedUrlRepository.findAll(spec, pageable);
     }
 
     @Override
     public Page<ShortenedUrl> findActiveLinks(User user, Pageable pageable) {
-        // Active links = not expired OR no expiration date
-        // We need to combine two queries here
-        LocalDateTime now = LocalDateTime.now();
+        Specification<ShortenedUrl> spec = Specification
+                .where(ShortenedUrlSpecifications.belongsToUser(user))
+                .and(ShortenedUrlSpecifications.activeLinks());
 
-        // Option 1: Links that expire in the future
-        Page<ShortenedUrl> notExpired = shortenedUrlRepository.findByUserAndExpiresAtAfter(user, now, pageable);
-
-        // Option 2: Links with no expiration
-        // In a real scenario, you'd want to combine these results
-        // For simplicity, let's use a custom query instead
-
-        // Better approach: Use advanced search
-        LinkSearchRequest request = new LinkSearchRequest(
-                null, null, null, null, null, false, "dateCreated", "desc"
-        );
-        return advancedSearchLinks(user, request, pageable);
+        return shortenedUrlRepository.findAll(spec, pageable);
     }
 
     @Override
@@ -143,9 +179,6 @@ public class ShortenedUrlServiceImpl implements ShortenedUrlService {
 
     @Override
     public long countActiveLinks(User user) {
-        // Active = (expires in future) + (no expiration)
-        long futureExpiration = shortenedUrlRepository.countByUserAndExpiresAtAfter(user, LocalDateTime.now());
-        long noExpiration = shortenedUrlRepository.countByUserAndExpiresAtIsNull(user);
-        return futureExpiration + noExpiration;
+        return shortenedUrlRepository.countByUserAndExpiresAtAfter(user, LocalDateTime.now());
     }
 }
