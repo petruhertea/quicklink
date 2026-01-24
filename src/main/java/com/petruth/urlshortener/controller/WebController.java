@@ -6,6 +6,8 @@ import com.petruth.urlshortener.entity.UserOAuthProvider;
 import com.petruth.urlshortener.repository.ClickAnalyticsRepository;
 import com.petruth.urlshortener.service.ShortenedUrlServiceImpl;
 import com.petruth.urlshortener.service.UserServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +33,7 @@ public class WebController {
     private final UserServiceImpl userService;
     private final ShortenedUrlServiceImpl shortenedUrlService;
     private final ClickAnalyticsRepository clickAnalyticsRepository;
+    private static final Logger log = LoggerFactory.getLogger(WebController.class);
 
     public WebController(UserServiceImpl userService,
                          ShortenedUrlServiceImpl shortenedUrlService,
@@ -46,7 +49,8 @@ public class WebController {
                        Model model) {
         if (principal != null && authToken != null) {
             try {
-                resolveUser(principal, authToken);
+                User user = resolveUser(principal, authToken);
+                model.addAttribute("user", user);
             } catch (Exception e) {
                 System.err.println("Error loading user for homepage: " + e.getMessage());
             }
@@ -55,24 +59,76 @@ public class WebController {
         return "index";
     }
 
+    // Replace the resolveUser method with this:
     private User resolveUser(OAuth2User principal, OAuth2AuthenticationToken authToken) {
         String provider = authToken.getAuthorizedClientRegistrationId();
+        log.info("=== Resolving user from WebController ===");
+        log.info("Provider: {}", provider);
+
         String oauthId;
 
         if ("github".equals(provider)) {
             Object idObj = principal.getAttribute("id");
             oauthId = idObj != null ? idObj.toString() : null;
-        } else {
+            log.info("GitHub - Extracted ID: {}", oauthId);
+        } else if ("google".equals(provider)) {
             oauthId = principal.getAttribute("sub");
+            log.info("Google - Extracted sub: {}", oauthId);
+        } else if ("microsoft".equals(provider)) {
+            // Microsoft uses 'oid' or 'sub'
+            oauthId = principal.getAttribute("oid");
+            if (oauthId == null) {
+                oauthId = principal.getAttribute("sub");
+            }
+            log.info("Microsoft - Extracted oid/sub: {}", oauthId);
+        } else {
+            Object idObj = principal.getAttribute("sub");
+            if (idObj == null) {
+                idObj = principal.getAttribute("id");
+            }
+            oauthId = idObj != null ? idObj.toString() : null;
+            log.info("Unknown provider - Extracted ID: {}", oauthId);
         }
 
         if (oauthId == null) {
+            log.error("OAuth ID is null for provider: {}", provider);
+            log.error("Available attributes: {}", principal.getAttributes().keySet());
             throw new RuntimeException("OAuth ID missing for provider " + provider);
         }
 
+        log.info("Querying database: provider={}, oauthId={}", provider, oauthId);
+
+        String finalOauthId = oauthId;
         return userService.findByOAuth(provider, oauthId)
-                .orElseThrow(() -> new RuntimeException("User not found"))
-                .getUser();
+                .map(oauthProvider -> {
+                    User user = oauthProvider.getUser();
+                    log.info("Found user: ID={}, Email={}", user.getId(), user.getEmail());
+                    return user;
+                })
+                .orElseThrow(() -> {
+                    log.error("User not found for provider={}, oauthId={}", provider, finalOauthId);
+
+                    // Debug: Let's see what we have in the database
+                    try {
+                        var allProviders = userService.findByEmail(principal.getAttribute("email"));
+                        if (allProviders.isPresent()) {
+                            User existingUser = allProviders.get();
+                            log.error("BUT user exists with this email! User ID: {}, Email: {}",
+                                    existingUser.getId(), existingUser.getEmail());
+                            log.error("OAuth providers for this user: {}",
+                                    existingUser.getOauthProviders().size());
+                            existingUser.getOauthProviders().forEach(p ->
+                                    log.error("  - Provider: {}, OAuth ID: {}", p.getOauthProvider(), p.getOauthId())
+                            );
+                        } else {
+                            log.error("No user found with email: {}", (Object) principal.getAttribute("email"));
+                        }
+                    } catch (Exception e) {
+                        log.error("Error during debug lookup", e);
+                    }
+
+                    return new RuntimeException("User not found");
+                });
     }
 
 
@@ -91,7 +147,8 @@ public class WebController {
 
         if (principal != null && authToken != null) {
             try {
-                resolveUser(principal, authToken);
+                User user = resolveUser(principal, authToken);
+                model.addAttribute("user", user);
             } catch (Exception e) {
                 System.err.println("Error loading user for homepage: " + e.getMessage());
             }

@@ -8,11 +8,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,26 +22,31 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Custom OAuth2 User Service for non-OIDC providers (like Google when configured as OAuth2)
+ * This handles the same logic as CustomOidcUserService but for OAuth2UserRequest
+ */
 @Service
-public class CustomOidcUserService extends OidcUserService {
+public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private static final Logger log = LoggerFactory.getLogger(CustomOidcUserService.class);
+    private static final Logger log = LoggerFactory.getLogger(CustomOAuth2UserService.class);
 
     private final UserService userService;
     private final UserOAuthProviderRepository oauthProviderRepository;
+    private final RestTemplate restTemplate = new RestTemplate();
 
-    public CustomOidcUserService(UserService userService,
-                                 UserOAuthProviderRepository oauthProviderRepository) {
+    public CustomOAuth2UserService(UserService userService,
+                                   UserOAuthProviderRepository oauthProviderRepository) {
         this.userService = userService;
         this.oauthProviderRepository = oauthProviderRepository;
     }
 
     @Override
-    @Transactional
-    public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
-        log.info("=== Starting OAuth login process ===");
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        log.info("=== Starting OAuth2 login process ===");
 
-        OidcUser oidcUser = super.loadUser(userRequest);
+        OAuth2User oauth2User = super.loadUser(userRequest);
 
         String provider = userRequest.getClientRegistration().getRegistrationId();
         log.info("Provider: {}", provider);
@@ -51,40 +57,41 @@ public class CustomOidcUserService extends OidcUserService {
         String name;
         String picture;
 
-        if ("microsoft".equals(provider)) {
-            log.info("Processing Microsoft login");
-            // Microsoft uses 'oid' (object identifier) or 'sub' for unique ID
-            oauthId = oidcUser.getAttribute("oid");
-            if (oauthId == null) {
-                oauthId = oidcUser.getAttribute("sub");
-            }
+        if ("google".equals(provider)) {
+            log.info("Processing Google OAuth2 login");
+            oauthId = oauth2User.getAttribute("sub");
+            email = oauth2User.getAttribute("email");
+            name = oauth2User.getAttribute("name");
+            picture = oauth2User.getAttribute("picture");
 
-            // Microsoft email
-            email = oidcUser.getAttribute("email");
+        } else if ("github".equals(provider)) {
+            log.info("Processing GitHub OAuth2 login");
+            Object idObj = oauth2User.getAttribute("id");
+            oauthId = idObj != null ? idObj.toString() : null;
+
+            // GitHub email might be null if not public
+            email = oauth2User.getAttribute("email");
             if (email == null || email.trim().isEmpty()) {
-                email = oidcUser.getAttribute("preferred_username");
+                log.info("Email not in GitHub user attributes, fetching from API");
+                email = fetchGitHubEmail(userRequest);
             }
 
-            // Microsoft name
-            name = oidcUser.getAttribute("name");
+            name = oauth2User.getAttribute("name");
             if (name == null || name.trim().isEmpty()) {
-                name = oidcUser.getAttribute("given_name");
+                name = oauth2User.getAttribute("login");
             }
-
-            picture = oidcUser.getAttribute("picture");
+            picture = oauth2User.getAttribute("avatar_url");
 
         } else {
-            log.warn("Unknown provider: {}, using fallback extraction", provider);
-            // Fallback for unknown providers
-            Object idAttribute = oidcUser.getAttribute("sub");
+            log.warn("Unknown OAuth2 provider: {}, using fallback extraction", provider);
+            Object idAttribute = oauth2User.getAttribute("sub");
             if (idAttribute == null) {
-                idAttribute = oidcUser.getAttribute("id");
+                idAttribute = oauth2User.getAttribute("id");
             }
             oauthId = (idAttribute != null) ? idAttribute.toString() : null;
-
-            email = oidcUser.getAttribute("email");
-            name = oidcUser.getAttribute("name");
-            picture = oidcUser.getAttribute("picture");
+            email = oauth2User.getAttribute("email");
+            name = oauth2User.getAttribute("name");
+            picture = oauth2User.getAttribute("picture");
         }
 
         log.info("Extracted OAuth ID: {}", oauthId);
@@ -104,7 +111,7 @@ public class CustomOidcUserService extends OidcUserService {
         }
 
         if (name == null || name.trim().isEmpty()) {
-            name = email.split("@")[0]; // Use email prefix as fallback
+            name = email.split("@")[0];
             log.info("Using email prefix as name: {}", name);
         }
 
@@ -118,7 +125,6 @@ public class CustomOidcUserService extends OidcUserService {
 
         if (oauthProvider != null) {
             log.info("Found existing OAuth provider, user ID: {}", oauthProvider.getUser().getId());
-            // Existing OAuth connection - get the user
             user = oauthProvider.getUser();
 
             // Update last used timestamp and profile picture
@@ -126,7 +132,7 @@ public class CustomOidcUserService extends OidcUserService {
             if (picture != null && !picture.trim().isEmpty()) {
                 oauthProvider.setProfilePicture(picture);
             }
-            oauthProvider = oauthProviderRepository.save(oauthProvider);
+            oauthProvider = oauthProviderRepository.saveAndFlush(oauthProvider);
             log.info("Updated OAuth provider last used time");
 
             // Update user's profile picture to the most recent one
@@ -138,12 +144,10 @@ public class CustomOidcUserService extends OidcUserService {
 
         } else {
             log.info("No existing OAuth provider found, checking for user by email: {}", email);
-            // New OAuth connection - check if user exists by email
             user = userService.findByEmail(email).orElse(null);
 
             if (user == null) {
                 log.info("No existing user found, creating new user");
-                // Create new user
                 user = new User();
                 user.setEmail(email);
                 user.setName(name);
@@ -153,7 +157,6 @@ public class CustomOidcUserService extends OidcUserService {
             } else {
                 log.info("Found existing user by email, ID: {}, linking new OAuth provider", user.getId());
 
-                // Update user's profile picture if the new one is available
                 if (picture != null && !picture.trim().isEmpty() && !picture.equals(user.getProfilePicture())) {
                     user.setProfilePicture(picture);
                     user = userService.save(user);
@@ -178,7 +181,7 @@ public class CustomOidcUserService extends OidcUserService {
             }
         }
 
-        // Update user info if changed (use most recent info)
+        // Update user info if changed
         boolean needsUpdate = false;
 
         if (!email.equals(user.getEmail())) {
@@ -193,7 +196,6 @@ public class CustomOidcUserService extends OidcUserService {
             needsUpdate = true;
         }
 
-        // Always update profile picture to the latest one from any provider
         if (picture != null && !picture.equals(user.getProfilePicture())) {
             log.info("Profile picture updated");
             user.setProfilePicture(picture);
@@ -205,10 +207,65 @@ public class CustomOidcUserService extends OidcUserService {
             log.info("Saved user updates");
         }
 
-        log.info("=== OAuth login completed successfully ===");
+        log.info("=== OAuth2 login completed successfully ===");
         log.info("Final state - User ID: {}, Email: {}, Provider: {}, OAuth ID: {}",
                 user.getId(), user.getEmail(), provider, oauthId);
 
-        return oidcUser;
+        return oauth2User;
+    }
+
+    /**
+     * Fetch GitHub email from API (for OAuth2UserRequest)
+     * GitHub doesn't always include email in the user attributes
+     */
+    private String fetchGitHubEmail(OAuth2UserRequest userRequest) {
+        try {
+            String accessToken = userRequest.getAccessToken().getTokenValue();
+
+            RequestEntity<Void> request = RequestEntity
+                    .get(URI.create("https://api.github.com/user/emails"))
+                    .header("Authorization", "Bearer " + accessToken)
+                    .build();
+
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    request,
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+
+            List<Map<String, Object>> emails = response.getBody();
+
+            if (emails != null && !emails.isEmpty()) {
+                // Try to find primary verified email
+                for (Map<String, Object> emailData : emails) {
+                    Boolean primary = (Boolean) emailData.get("primary");
+                    Boolean verified = (Boolean) emailData.get("verified");
+
+                    if (Boolean.TRUE.equals(primary) && Boolean.TRUE.equals(verified)) {
+                        String email = (String) emailData.get("email");
+                        log.info("Found primary verified GitHub email: {}", email);
+                        return email;
+                    }
+                }
+
+                // Fallback to any verified email
+                for (Map<String, Object> emailData : emails) {
+                    Boolean verified = (Boolean) emailData.get("verified");
+                    if (Boolean.TRUE.equals(verified)) {
+                        String email = (String) emailData.get("email");
+                        log.info("Found verified GitHub email: {}", email);
+                        return email;
+                    }
+                }
+
+                // Last resort: use first email
+                String email = (String) emails.get(0).get("email");
+                log.warn("Using first GitHub email (not verified): {}", email);
+                return email;
+            }
+        } catch (Exception e) {
+            log.error("Failed to fetch GitHub email: {}", e.getMessage(), e);
+        }
+
+        return null;
     }
 }

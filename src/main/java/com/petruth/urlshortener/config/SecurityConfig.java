@@ -1,5 +1,6 @@
 package com.petruth.urlshortener.config;
 
+import com.petruth.urlshortener.service.CustomOAuth2UserService;
 import com.petruth.urlshortener.service.CustomOidcUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,10 +15,13 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 public class SecurityConfig {
 
     private final CustomOidcUserService customOidcUserService;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
-    // Constructor injection
-    public SecurityConfig(CustomOidcUserService customOidcUserService) {
+    // Constructor injection for both services
+    public SecurityConfig(CustomOidcUserService customOidcUserService,
+                          CustomOAuth2UserService customOAuth2UserService) {
         this.customOidcUserService = customOidcUserService;
+        this.customOAuth2UserService = customOAuth2UserService;
     }
 
     @Bean
@@ -32,7 +36,10 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .defaultSuccessUrl("/dashboard", true)
                         .userInfoEndpoint(userInfo -> userInfo
+                                // For OIDC providers (Microsoft, etc.)
                                 .oidcUserService(customOidcUserService)
+                                // For OAuth2 providers (Google, GitHub, etc.)
+                                .userService(customOAuth2UserService)
                         )
                 )
                 .logout(logout -> logout
@@ -49,13 +56,10 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/api/**", "/payment/**")
                 )
                 .headers(headers -> headers
-                        // Prevent clickjacking
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
-                        // XSS Protection
                         .xssProtection(xss -> xss
                                 .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
                         )
-                        // Content Security Policy
                         .contentSecurityPolicy(csp -> csp.policyDirectives(
                                 "default-src 'self'; " +
                                         "img-src 'self' https://lh3.googleusercontent.com https://avatars.githubusercontent.com data:; " +
