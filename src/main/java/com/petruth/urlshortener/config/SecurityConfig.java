@@ -64,6 +64,7 @@ public class SecurityConfig {
                                 "default-src 'self'; " +
                                         "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
                                         "script-src-elem 'self' https://pagead2.googlesyndication.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
+                                        "script-src-attr 'self' 'unsafe-inline'; " +
                                         "img-src 'self' https://lh3.googleusercontent.com https://avatars.githubusercontent.com data:; " +
                                         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
                                         "font-src 'self' https://cdn.jsdelivr.net; " +
