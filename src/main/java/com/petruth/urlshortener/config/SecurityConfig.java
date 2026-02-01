@@ -62,16 +62,32 @@ public class SecurityConfig {
                         )
                         .contentSecurityPolicy(csp -> csp.policyDirectives(
                                 "default-src 'self'; " +
-                                        "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
-                                        "script-src-elem 'self' https://pagead2.googlesyndication.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
+                                        "script-src 'self' 'unsafe-inline' " +
+                                        "https://pagead2.googlesyndication.com " +
+                                        "https://tpc.googlesyndication.com " +
+                                        "https://www.googletagservices.com " +
+                                        "https://www.google.com " +
+                                        "https://cdn.jsdelivr.net " +
+                                        "https://cdnjs.cloudflare.com; " +
+                                        "script-src-elem 'self' " +
+                                        "https://pagead2.googlesyndication.com " +
+                                        "https://tpc.googlesyndication.com " +
+                                        "https://www.googletagservices.com " +
+                                        "https://www.google.com " +
+                                        "https://cdn.jsdelivr.net " +
+                                        "https://cdnjs.cloudflare.com " +
+                                        "https://ep1.adtrafficquality.google " +
+                                        "https://ep2.adtrafficquality.google; " +
                                         "script-src-attr 'self' 'unsafe-inline'; " +
                                         "img-src 'self' https://lh3.googleusercontent.com https://avatars.githubusercontent.com data:; " +
                                         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
                                         "font-src 'self' https://cdn.jsdelivr.net; " +
-                                        "connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://ep1.adtrafficquality.google; " +
+                                        "connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com " +
+                                        "https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google; " +
                                         "frame-src https://pagead2.googlesyndication.com"
                         ))
                 )
+
                 .build();
     }
 }
