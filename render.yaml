@@ -1,99 +1,62 @@
 ################################################################################
-# render.yaml — QuickLink URL Shortener  (Supabase backend)
-#
-# Deploys:
-#   • Web service only – PostgreSQL lives on Supabase, not Render.
-#
-# Secrets referenced below must be set as Environment Variables
-# in the Render dashboard (or via the Render API) BEFORE the first deploy:
-#
-#   SUPABASE_DB_URL               Pooled connection (port 6543) – used by the app
-#   SUPABASE_DB_URL_DIRECT        Direct connection (port 5432) – used by Flyway
-#   GITHUB_CLIENT_ID              GitHub OAuth App client ID
-#   GITHUB_CLIENT_SECRET          GitHub OAuth App client secret
-#   GOOGLE_CLIENT_ID              Google OAuth App client ID
-#   GOOGLE_CLIENT_SECRET          Google OAuth App client secret
-#   MICROSOFT_CLIENT_ID           Azure AD App client ID
-#   MICROSOFT_CLIENT_SECRET       Azure AD App client secret
-#   STRIPE_SECRET_KEY             Stripe live/test secret key
-#   STRIPE_WEBHOOK_SECRET         Stripe webhook endpoint signing secret
-#   STRIPE_PRICE_ID               Stripe Price ID for the $5/mo subscription
-#
-# Where to find the Supabase URLs:
-#   Dashboard → Project Settings → Connection → "Connection string"
-#     • "URI" view, Mode = "Transaction pooler"  →  SUPABASE_DB_URL
-#     • "URI" view, Mode = "Direct connection"   →  SUPABASE_DB_URL_DIRECT
-#
-# The APP_URL variable is set automatically using the Render-provided
-# oneDeploy URL so that Stripe success/cancel callbacks resolve correctly.
+# render.yaml — QuickLink URL Shortener (Supabase backend)
 ################################################################################
 
 services:
-  # ---------------------------------------------------------------------------
-  # Web Service
-  # ---------------------------------------------------------------------------
   - type: web
     name: quicklink-urlshortener
-    runtime: docker                       # uses ./Dockerfile
-    region: frankfurt                           # US-East; change to match your users
-    plan: starter                         # upgrade to "standard" for autoscaling
+    runtime: docker
+    region: frankfurt
+    plan: starter
 
-    # --- Build ----------------------------------------------------------
-    buildCommand: ""                      # Dockerfile handles everything
+    # Dockerfile handles the build
+    buildCommand: ""
 
-    # --- Health check ---------------------------------------------------
-    # Matches management.endpoints.web.exposure.include=health in
-    # application.properties.  Render will route traffic only after 200.
+    # Health check (Spring Boot Actuator)
     healthCheckPath: /actuator/health
 
-    # --- Environment ----------------------------------------------------
-    env:
-      # ·· Supabase – Database ········································
-      # Two URLs are needed:
-      #   DB_URL        → pooled (PgBouncer, port 6543) – normal app queries
-      #   DB_URL_DIRECT → direct (port 5432)            – Flyway migrations only
-      # Both are set manually in the Render dashboard; they contain credentials
-      # so they must never be committed to source control.
-      SUPABASE_DB_URL:
-        sync: false
-      SUPABASE_DB_URL_DIRECT:
+    envVars:
+      # --- Supabase ----------------------------------------------------
+      - key: SUPABASE_DB_URL
         sync: false
 
-      # ·· Self-reference (used by Stripe callbacks & QR codes) ········
-      APP_URL:
+      - key: SUPABASE_DB_URL_DIRECT
+        sync: false
+
+      # --- App self URL (used by Stripe, QR, redirects) ----------------
+      - key: APP_URL
         fromService:
           type: web
           name: quicklink-urlshortener
-          property: oneDeploy            # https://<slug>.onrender.com
+          property: oneDeploy
 
-      # ·· OAuth – GitHub ····················································
-      GITHUB_CLIENT_ID:
-        sync: false                       # set manually in dashboard
-      GITHUB_CLIENT_SECRET:
+      # --- OAuth -------------------------------------------------------
+      - key: GITHUB_CLIENT_ID
         sync: false
-
-      # ·· OAuth – Google ····················································
-      GOOGLE_CLIENT_ID:
-        sync: false
-      GOOGLE_CLIENT_SECRET:
+      - key: GITHUB_CLIENT_SECRET
         sync: false
 
-      # ·· OAuth – Microsoft ·················································
-      MICROSOFT_CLIENT_ID:
+      - key: GOOGLE_CLIENT_ID
         sync: false
-      MICROSOFT_CLIENT_SECRET:
-        sync: false
-
-      # ·· Stripe ····················································
-      STRIPE_SECRET_KEY:
-        sync: false
-      STRIPE_WEBHOOK_SECRET:
-        sync: false
-      STRIPE_PRICE_ID:
+      - key: GOOGLE_CLIENT_SECRET
         sync: false
 
-      # ·· Spring / HikariCP tuning for Supabase's PgBouncer ····················
-      # PgBouncer's default connection limit per project is low; keep the pool
-      # small to avoid "too many connections" errors on the starter plan.
-      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "5"
-      SPRING_JPA_HIBERNATE_DDL_AUTO: validate            # Flyway owns schema
+      - key: MICROSOFT_CLIENT_ID
+        sync: false
+      - key: MICROSOFT_CLIENT_SECRET
+        sync: false
+
+      # --- Stripe ------------------------------------------------------
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_ID
+        sync: false
+
+      # --- Spring / HikariCP tuning -----------------------------------
+      - key: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
+        value: "5"
+
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: validate
