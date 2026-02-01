@@ -4,7 +4,7 @@
 
 services:
   - type: web
-    name: quicklink-urlshortener
+    name: quicklink
     runtime: docker
     region: frankfurt
     plan: starter
@@ -25,10 +25,7 @@ services:
 
       # --- App self URL (used by Stripe, QR, redirects) ----------------
       - key: APP_URL
-        fromService:
-          type: web
-          name: quicklink-urlshortener
-          property: oneDeploy
+        sync: false
 
       # --- OAuth -------------------------------------------------------
       - key: GITHUB_CLIENT_ID
