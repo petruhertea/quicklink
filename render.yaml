@@ -7,7 +7,7 @@ services:
     name: quicklink
     runtime: docker
     region: frankfurt
-    plan: starter
+    plan: free
 
     # Dockerfile handles the build
     buildCommand: ""
