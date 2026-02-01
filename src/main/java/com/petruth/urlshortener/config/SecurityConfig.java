@@ -89,7 +89,11 @@ public class SecurityConfig {
                                         // script-src-attr – on* event-handler attributes
                                         "script-src-attr 'self' 'unsafe-inline'; " +
 
-                                        "img-src 'self' https://lh3.googleusercontent.com https://avatars.githubusercontent.com data:; " +
+                                        // img-src – allow profile avatars from OAuth providers, inline data URIs,
+                                        // and Google's Ad Traffic Quality sodar pixel (same ep1/ep2 subdomains
+                                        // already whitelisted in frame-src and script-src-elem).
+                                        "img-src 'self' https://lh3.googleusercontent.com https://avatars.githubusercontent.com " +
+                                        "https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google data:; " +
                                         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
                                         "font-src 'self' https://cdn.jsdelivr.net; " +
                                         "connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com " +
