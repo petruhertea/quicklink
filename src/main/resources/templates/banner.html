@@ -1,0 +1,45 @@
+<!--
+  ads/banner.html – reusable ad fragment.
+
+  Usage in any template:
+      <div th:replace="~{ads/banner}"></div>
+
+  The fragment is automatically injected by AdInterceptor into every
+  page model, but you can also drop it manually wherever you like.
+
+  Premium users see nothing – the entire <div> is removed server-side.
+-->
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+     th:fragment="banner"
+     sec:authorize="!hasRole('ROLE_PREMIUM') and isAuthenticated() or isAnonymous()"
+     class="ql-ad-wrapper">
+
+    <!-- Top-of-page banner ad (728×90 desktop / 320×50 mobile) -->
+    <div class="ql-ad ql-ad--banner" id="ql-ad-banner">
+        <div class="ql-ad__label">Advertisement</div>
+        <div class="ql-ad__slot" id="ql-ad-banner-slot">
+            <!--
+              Replace the placeholder <div> below with your actual ad-network
+              script tag (e.g. Google AdSense, Propeller Ads, etc.).
+
+              Example for AdSense:
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXX" crossorigin="anonymous"></script>
+                <ins class="adsbygoogle" style="display:block;width:728px;height:90px;" data-ad-client="ca-pub-XXXXXXX" data-ad-slot="XXXXXXX" data-ad-format="auto"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+            -->
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8319917367585912"
+                    crossorigin="anonymous"></script>
+            <!-- quicklink-ads -->
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-8319917367585912"
+                 data-ad-slot="5421807787"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+</div>

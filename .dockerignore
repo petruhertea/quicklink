@@ -1,0 +1,35 @@
+# Compiled output
+target/
+
+# IDE metadata
+.idea/
+*.iml
+.vscode/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+nbproject/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Secrets – NEVER bake into the image
+env.properties
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Maven wrapper JAR (downloaded at build time via the shell script)
+.mvn/wrapper/maven-wrapper.jar
+
+# Docker files themselves
+Dockerfile
+.dockerignore
+docker-compose*.yml
+render.yaml

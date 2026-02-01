@@ -1,0 +1,50 @@
+version: "3.8"
+
+# ---------------------------------------------------------------------------
+# Local PostgreSQL – mirrors the Supabase schema for offline development.
+# Production still talks to Supabase; this is convenience-only.
+# ---------------------------------------------------------------------------
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: urlshortener
+    ports:
+      - "5432:5432"
+    volumes:
+      # Flyway migrations run automatically on app start, so the DB
+      # will be initialised even without a separate init script.
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d urlshortener"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Application
+  # ---------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    # Secrets live in env.properties – never committed to VCS
+    env_file:
+      - src/main/resources/env.properties
+    environment:
+      # Override the Supabase URL with the local DB when running via Compose.
+      DB_URL: jdbc:postgresql://aws-1-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require&prepareThreshold=0&preparedStatementCacheQueries=0&preparedStatementCacheSizeMiB=0
+      DB_USERNAME: postgres.yvloorhymmntcjygrxpt
+      DB_PASSWORD: WgNoCXn8ImOx9bRN
+      # Local APP_URL so Stripe redirect URLs resolve
+      APP_URL: http://localhost:8080
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
