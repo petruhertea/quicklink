@@ -62,10 +62,10 @@ public class SecurityConfig {
                         )
                         .contentSecurityPolicy(csp -> csp.policyDirectives(
                                 "default-src 'self'; " +
-                                        "script-src 'self' https://pagead2.googlesyndication.com/pagead/js/"+
+                                        "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
+                                        "script-src-elem 'self' https://pagead2.googlesyndication.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
                                         "img-src 'self' https://lh3.googleusercontent.com https://avatars.githubusercontent.com data:; " +
                                         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
-                                        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
                                         "font-src 'self' https://cdn.jsdelivr.net; " +
                                         "connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com"
                         ))
