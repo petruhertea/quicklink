@@ -35,7 +35,7 @@ services:
   - type: web
     name: quicklink-urlshortener
     runtime: docker                       # uses ./Dockerfile
-    region:                            # US-East; change to match your users
+    region: frankfurt                           # US-East; change to match your users
     plan: starter                         # upgrade to "standard" for autoscaling
 
     # --- Build ----------------------------------------------------------
