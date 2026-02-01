@@ -151,9 +151,6 @@
         <p>Sign in to manage your links</p>
     </div>
 
-    <!-- Show the ad banner (hidden automatically for premium users) -->
-    <div th:replace="~{ads/banner}"></div>
-
     <!-- Error message if login failed -->
     <div th:if="${param.error}" class="error-alert">
         <strong>⚠️ Authentication failed</strong><br />
@@ -236,5 +233,8 @@
         <a href="/">← Back to home</a>
     </div>
 </div>
+
+<!-- Show the ad banner (hidden automatically for premium users) -->
+<div th:replace="~{ads/banner}"></div>
 </body>
 </html>

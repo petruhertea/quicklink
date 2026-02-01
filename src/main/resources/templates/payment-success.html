@@ -45,12 +45,8 @@
             fill: none;
         }
         @keyframes scaleIn {
-            from {
-                transform: scale(0);
-            }
-            to {
-                transform: scale(1);
-            }
+            from { transform: scale(0); }
+            to   { transform: scale(1); }
         }
         .premium-badge {
             display: inline-block;
@@ -61,10 +57,7 @@
             font-weight: 700;
             margin: 1rem 0;
         }
-        .benefits {
-            text-align: left;
-            margin: 2rem 0;
-        }
+        .benefits { text-align: left; margin: 2rem 0; }
         .benefit-item {
             display: flex;
             align-items: center;
@@ -91,15 +84,10 @@
         </svg>
     </div>
 
-    <!-- Show the ad banner (hidden automatically for premium users) -->
-    <div th:replace="~{ads/banner}"></div>
-
     <h1 class="h2 mb-3">Welcome to Premium! 🎉</h1>
     <p class="text-muted">Your payment was successful</p>
 
-    <div class="premium-badge">
-        ⭐ PREMIUM MEMBER
-    </div>
+    <div class="premium-badge">⭐ PREMIUM MEMBER</div>
 
     <div class="benefits">
         <h5 class="mb-3">Your Premium Benefits:</h5>
