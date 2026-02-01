@@ -10,6 +10,8 @@ COPY .mvn/           .mvn/
 COPY mvnw            mvnw
 COPY pom.xml         pom.xml
 
+RUN chmod +x mvnw
+
 # Download dependencies (cached layer – invalidated only when pom.xml changes)
 RUN ./mvnw dependency:go-offline -q
 
@@ -17,7 +19,6 @@ RUN ./mvnw dependency:go-offline -q
 COPY src/            src/
 
 # Build the fat JAR (-DskipTests because integration tests need a live DB)
-RUN chmod +x mvnw
 RUN ./mvnw package -Dmaven.test.skip=true -q
 
 # ---------------------------------------------------------------------------
