@@ -67,7 +67,8 @@ public class SecurityConfig {
                                         "img-src 'self' https://lh3.googleusercontent.com https://avatars.githubusercontent.com data:; " +
                                         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
                                         "font-src 'self' https://cdn.jsdelivr.net; " +
-                                        "connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com"
+                                        "connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://ep1.adtrafficquality.google; " +
+                                        "frame-src https://pagead2.googlesyndication.com"
                         ))
                 )
                 .build();
