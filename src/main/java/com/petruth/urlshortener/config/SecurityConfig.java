@@ -27,7 +27,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/", "/api/shorten", "/api/{code}", "/login", "/css/**", "/js/**", "/error", "/payment/webhook","/QuickLink_Privacy_Policy.docx", "/QuickLink_Terms_of_Service.docx").permitAll();
+                    auth.requestMatchers("/", "/api/shorten", "/api/{code}", "/login", "/css/**", "/js/**", "/error", "/payment/webhook","/QuickLink_Privacy_Policy.docx", "/QuickLink_Terms_of_Service.docx","/ads.txt").permitAll();
                     auth.requestMatchers("/dashboard/**", "/subscription", "/analytics/**", "/api/analytics/**", "/actuator/**", "/payment/**").authenticated();
                     auth.anyRequest().authenticated();
                 })
