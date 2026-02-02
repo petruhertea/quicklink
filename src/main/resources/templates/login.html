@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <link rel="stylesheet" href="/css/ads.css">
+    <link href="/css/dark-mode.css" rel="stylesheet">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign In - QuickLink</title>
@@ -11,15 +12,16 @@
     />
     <style>
         body {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
         }
         .login-card {
-          background: white;
+          background: var(--ql-card-bg);
+          color: var(--ql-text-primary);
           border-radius: 20px;
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
           padding: 3rem;
@@ -43,8 +45,8 @@
           width: 100%;
           padding: 14px 20px;
           border-radius: 10px;
-          border: 2px solid #e9ecef;
-          background: white;
+          border: 2px solid var(--ql-border-color);
+          background: var(--ql-card-bg);
           font-weight: 600;
           font-size: 1rem;
           transition: all 0.3s;
@@ -54,12 +56,12 @@
           gap: 12px;
           margin-bottom: 1rem;
           text-decoration: none;
-          color: #212529;
+          color: var(--ql-text-primary);
         }
         .oauth-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-          color: #212529;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            color: var(--ql-text-primary);
         }
         .google-btn:hover {
           border-color: #4285f4;
@@ -82,13 +84,11 @@
           left: 0;
           right: 0;
           height: 1px;
-          background: #e9ecef;
+          background: var(--ql-border-color);
         }
         .divider span {
-          background: white;
           padding: 0 1rem;
           position: relative;
-          color: #6c757d;
           font-size: 0.875rem;
         }
         .back-link {
@@ -113,7 +113,6 @@
           font-size: 0.9rem;
         }
         .benefits {
-          background: #f8f9fa;
           border-radius: 10px;
           padding: 1.5rem;
           margin-top: 2rem;
@@ -121,7 +120,6 @@
         .benefits h6 {
           font-weight: 700;
           margin-bottom: 1rem;
-          color: #495057;
         }
         .benefits ul {
           list-style: none;
@@ -130,7 +128,6 @@
         }
         .benefits li {
           padding: 0.5rem 0;
-          color: #6c757d;
           font-size: 0.9rem;
         }
         .benefits li::before {
@@ -234,5 +231,6 @@
         <a href="/">← Back to home</a>
     </div>
 </div>
+<script src="/js/dark-mode.js"></script>
 </body>
 </html>

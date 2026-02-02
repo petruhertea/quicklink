@@ -1,0 +1,623 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   dark-mode.css – QuickLink Global Dark Mode System
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Usage:
+   1. Add to <head> in ALL templates:
+      <link rel="stylesheet" href="/css/dark-mode.css">
+
+   2. Add before </body> in ALL templates:
+      <script src="/js/dark-mode.js"></script>
+
+   3. Add the toggle button to your navbar (see dark-mode.js for snippet)
+
+   This file defines CSS variables that automatically switch between light
+   and dark themes based on the [data-theme] attribute on <html>.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Light Mode (Default) ────────────────────────────────────────────── */
+  --ql-bg-primary:       #ffffff;
+  --ql-bg-secondary:     #f8f9fa;
+  --ql-bg-tertiary:      #e9ecef;
+
+  --ql-text-primary:     #212529;
+  --ql-text-secondary:   #6c757d;
+  --ql-text-muted:       #adb5bd;
+
+  --ql-border-color:     #dee2e6;
+  --ql-border-light:     #e9ecef;
+
+  --ql-card-bg:          #ffffff;
+  --ql-card-shadow:      rgba(0, 0, 0, 0.1);
+
+  --ql-navbar-bg:        #ffffff;
+  --ql-navbar-shadow:    rgba(0, 0, 0, 0.1);
+
+  --ql-input-bg:         #ffffff;
+  --ql-input-border:     #ced4da;
+  --ql-input-focus:      #667eea;
+
+  /* Brand colors – same in both modes */
+  --ql-brand-primary:    #667eea;
+  --ql-brand-secondary:  #764ba2;
+  --ql-brand-gradient:   linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  --ql-success:          #198754;
+  --ql-danger:           #dc3545;
+  --ql-warning:          #ffc107;
+  --ql-info:             #0dcaf0;
+}
+
+[data-theme="dark"] {
+  /* ─── Dark Mode ────────────────────────────────────────────────────────── */
+  --ql-bg-primary:       #1a1d23;
+  --ql-bg-secondary:     #25292f;
+  --ql-bg-tertiary:      #2d3238;
+
+  --ql-text-primary:     #e9ecef;
+  --ql-text-secondary:   #adb5bd;
+  --ql-text-muted:       #6c757d;
+
+  --ql-border-color:     #3d4147;
+  --ql-border-light:     #2d3238;
+
+  --ql-card-bg:          #25292f;
+  --ql-card-shadow:      rgba(0, 0, 0, 0.3);
+
+  --ql-navbar-bg:        #1f2227;
+  --ql-navbar-shadow:    rgba(0, 0, 0, 0.5);
+
+  --ql-input-bg:         #2d3238;
+  --ql-input-border:     #3d4147;
+  --ql-input-focus:      #667eea;
+
+  /* Adjusted brand colors for dark mode readability */
+  --ql-brand-primary:    #7c8ef5;
+  --ql-brand-secondary:  #8a5ab8;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Global Element Styling
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+body {
+  background-color: var(--ql-bg-secondary) !important;
+  color: var(--ql-text-primary) !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ─── Cards ───────────────────────────────────────────────────────────────── */
+.card,
+.analytics-card,
+.login-card,
+.success-card {
+  background-color: var(--ql-card-bg) !important;
+  color: var(--ql-text-primary) !important;
+  border-color: var(--ql-border-color) !important;
+  box-shadow: 0 2px 8px var(--ql-card-shadow) !important;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ─── Navbar ──────────────────────────────────────────────────────────────── */
+.navbar {
+  background-color: var(--ql-navbar-bg) !important;
+  box-shadow: 0 2px 4px var(--ql-navbar-shadow) !important;
+  border-bottom: 1px solid var(--ql-border-light);
+  transition: background-color 0.3s ease;
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link,
+.navbar .btn-link {
+  color: var(--ql-text-primary) !important;
+}
+
+/* ─── Forms & Inputs ──────────────────────────────────────────────────────── */
+.form-control,
+.form-select,
+input[type="text"],
+input[type="email"],
+input[type="url"],
+textarea {
+  background-color: var(--ql-input-bg) !important;
+  color: var(--ql-text-primary) !important;
+  border-color: var(--ql-input-border) !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--ql-input-bg) !important;
+  border-color: var(--ql-input-focus) !important;
+  box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25) !important;
+}
+
+.form-control::placeholder {
+  color: var(--ql-text-muted) !important;
+}
+
+/* Input group addons */
+.input-group-text {
+  background-color: var(--ql-bg-tertiary) !important;
+  color: var(--ql-text-secondary) !important;
+  border-color: var(--ql-input-border) !important;
+}
+
+.input-group .form-control:not(:last-child) {
+  border-right: none;
+}
+
+.input-group .input-group-text + .form-control {
+  border-left: none;
+}
+
+/* ─── Tables ──────────────────────────────────────────────────────────────── */
+.table {
+  color: var(--ql-text-primary) !important;
+  border-color: var(--ql-border-light) !important;
+}
+
+.table-hover tbody tr:hover {
+  background-color: var(--ql-bg-tertiary) !important;
+}
+
+.table thead th {
+  border-bottom: 2px solid var(--ql-border-color) !important;
+  background-color: var(--ql-bg-secondary) !important;
+  color: var(--ql-text-primary) !important;
+}
+
+.table td,
+.table th {
+  border-color: var(--ql-border-light) !important;
+}
+
+.table tbody tr {
+  background-color: var(--ql-card-bg) !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: var(--ql-bg-secondary) !important;
+}
+
+/* ─── Pagination ──────────────────────────────────────────────────────────── */
+.pagination {
+  margin: 0;
+}
+
+.page-link {
+  background-color: var(--ql-card-bg) !important;
+  color: var(--ql-text-primary) !important;
+  border-color: var(--ql-border-color) !important;
+  transition: all 0.3s ease;
+}
+
+.page-link:hover {
+  background-color: var(--ql-bg-tertiary) !important;
+  color: var(--ql-brand-primary) !important;
+  border-color: var(--ql-brand-primary) !important;
+}
+
+.page-link:focus {
+  box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25) !important;
+}
+
+.page-item.active .page-link {
+  background-color: var(--ql-brand-primary) !important;
+  border-color: var(--ql-brand-primary) !important;
+  color: white !important;
+}
+
+.page-item.disabled .page-link {
+  background-color: var(--ql-bg-secondary) !important;
+  color: var(--ql-text-muted) !important;
+  border-color: var(--ql-border-light) !important;
+  opacity: 0.6;
+}
+
+/* ─── Modals & Dropdowns ──────────────────────────────────────────────────── */
+.modal-content,
+.dropdown-menu {
+  background-color: var(--ql-card-bg) !important;
+  color: var(--ql-text-primary) !important;
+  border-color: var(--ql-border-color) !important;
+}
+
+.dropdown-item {
+  color: var(--ql-text-primary) !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: var(--ql-bg-tertiary) !important;
+}
+
+/* ─── Alerts & Badges ─────────────────────────────────────────────────────── */
+.alert {
+  border-color: var(--ql-border-color) !important;
+}
+
+.badge.bg-light {
+  background-color: var(--ql-bg-tertiary) !important;
+  color: var(--ql-text-primary) !important;
+}
+
+/* ─── Text Colors ─────────────────────────────────────────────────────────── */
+.text-muted {
+  color: var(--ql-text-muted) !important;
+}
+
+.text-secondary {
+  color: var(--ql-text-secondary) !important;
+}
+
+/* Bootstrap text utilities - force override */
+.text-dark {
+  color: var(--ql-text-primary) !important;
+}
+
+small.text-muted {
+  color: var(--ql-text-muted) !important;
+}
+
+p.text-muted {
+  color: var(--ql-text-muted) !important;
+}
+
+span.text-muted {
+  color: var(--ql-text-muted) !important;
+}
+
+div.text-muted {
+  color: var(--ql-text-muted) !important;
+}
+
+/* Ensure muted text in specific contexts */
+.card .text-muted,
+.modal .text-muted,
+.alert .text-muted,
+td.text-muted,
+th.text-muted,
+li.text-muted {
+  color: var(--ql-text-muted) !important;
+}
+
+/* ─── Links ───────────────────────────────────────────────────────────────── */
+a {
+  color: var(--ql-brand-primary);
+}
+
+a:hover {
+  color: var(--ql-brand-secondary);
+}
+
+/* ─── Borders ─────────────────────────────────────────────────────────────── */
+.border,
+.border-top,
+.border-bottom,
+.border-start,
+.border-end {
+  border-color: var(--ql-border-color) !important;
+}
+
+/* ─── Buttons ─────────────────────────────────────────────────────────────── */
+.btn-outline-primary {
+  color: var(--ql-brand-primary) !important;
+  border-color: var(--ql-brand-primary) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--ql-brand-primary) !important;
+  color: white !important;
+}
+
+.btn-outline-secondary {
+  color: var(--ql-text-secondary) !important;
+  border-color: var(--ql-input-border) !important;
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--ql-bg-tertiary) !important;
+  color: var(--ql-text-primary) !important;
+}
+
+.btn-link {
+  color: var(--ql-brand-primary) !important;
+}
+
+/* ─── Page-Specific: Link Info Box ───────────────────────────────────────── */
+.link-info {
+  background-color: var(--ql-bg-tertiary) !important;
+  color: var(--ql-text-primary) !important;
+}
+
+/* ─── Page-Specific: Result Boxes ────────────────────────────────────────── */
+.result-box {
+  background-color: var(--ql-bg-tertiary) !important;
+  color: var(--ql-text-primary) !important;
+}
+
+/* ─── Page-Specific: Search Bar ──────────────────────────────────────────── */
+.search-bar {
+  background-color: var(--ql-card-bg) !important;
+  color: var(--ql-text-primary) !important;
+}
+
+/* ─── Page-Specific: Bulk Card ───────────────────────────────────────────── */
+.bulk-card {
+  background-color: var(--ql-card-bg) !important;
+  color: var(--ql-text-primary) !important;
+}
+
+/* ─── Page-Specific: Drop Zone ───────────────────────────────────────────── */
+.drop-zone {
+  background-color: var(--ql-bg-tertiary) !important;
+  color: var(--ql-text-primary) !important;
+  border-color: var(--ql-brand-primary) !important;
+}
+
+.drop-zone:hover {
+  background-color: var(--ql-bg-secondary) !important;
+}
+
+.drop-zone.active {
+  background-color: var(--ql-bg-secondary) !important;
+  border-color: var(--ql-brand-primary) !important;
+}
+
+/* ─── Page-Specific: Login Benefits Box ──────────────────────────────────── */
+.benefits {
+  background-color: var(--ql-bg-tertiary) !important;
+  color: var(--ql-text-primary) !important;
+}
+
+.benefits h6 {
+  color: var(--ql-text-primary) !important;
+}
+
+.benefits li {
+  color: var(--ql-text-secondary) !important;
+}
+
+/* ─── Page-Specific: URL Code Badge ──────────────────────────────────────── */
+.url-code {
+  background-color: var(--ql-bg-tertiary) !important;
+  color: var(--ql-brand-primary) !important;
+}
+
+/* ─── Page-Specific: Stats Card ──────────────────────────────────────────── */
+.stats-card {
+  background-color: var(--ql-card-bg) !important;
+  color: var(--ql-text-primary) !important;
+}
+
+.stats-card h3 {
+  color: var(--ql-brand-primary) !important;
+}
+
+.stats-card p {
+  color: var(--ql-text-secondary) !important;
+}
+
+/* ─── Page-Specific: URL Card ────────────────────────────────────────────── */
+.url-card {
+  background-color: var(--ql-card-bg) !important;
+  color: var(--ql-text-primary) !important;
+}
+
+/* ─── Page-Specific: Subscription Card ───────────────────────────────────── */
+.subscription-card {
+  background-color: var(--ql-card-bg) !important;
+  color: var(--ql-text-primary) !important;
+}
+
+/* ─── Page-Specific: Feature List ────────────────────────────────────────── */
+.feature-list li {
+  border-bottom: 1px solid var(--ql-border-light) !important;
+}
+
+/* ─── Page-Specific: Premium Badge (keep gold in both modes) ─────────────── */
+.premium-badge {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%) !important;
+  color: #333 !important;
+}
+
+/* ─── Page-Specific: Stat Boxes (keep gradient in both modes) ────────────── */
+.stat-box {
+  background: var(--ql-brand-gradient) !important;
+  color: white !important;
+}
+
+/* ─── Chart.js Dark Mode Support ──────────────────────────────────────────── */
+[data-theme="dark"] canvas {
+  filter: brightness(0.9);
+}
+
+/* ─── Dark Mode Toggle Button ─────────────────────────────────────────────── */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--ql-text-primary);
+  transition: fill 0.3s ease;
+}
+
+/* Hide sun in light mode, moon in dark mode */
+[data-theme="light"] .theme-toggle .moon-icon { display: none; }
+[data-theme="dark"] .theme-toggle .sun-icon { display: none; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Ad Banner Dark Mode Override
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-theme="dark"] .ql-ad-wrapper {
+  background-color: var(--ql-card-bg) !important;
+  border-color: var(--ql-border-color) !important;
+}
+
+[data-theme="dark"] .ql-ad__label {
+  color: var(--ql-text-muted) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Bootstrap Override for Dark Mode
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-theme="dark"] .bg-light {
+  background-color: var(--ql-bg-tertiary) !important;
+}
+
+[data-theme="dark"] .bg-white {
+  background-color: var(--ql-card-bg) !important;
+}
+
+[data-theme="dark"] .text-dark {
+  color: var(--ql-text-primary) !important;
+}
+
+[data-theme="dark"] .text-muted {
+  color: var(--ql-text-muted) !important;
+}
+
+[data-theme="dark"] .text-secondary {
+  color: var(--ql-text-secondary) !important;
+}
+
+/* Card text */
+[data-theme="dark"] .card-text {
+  color: var(--ql-text-primary) !important;
+}
+
+[data-theme="dark"] .card-title {
+  color: var(--ql-text-primary) !important;
+}
+
+[data-theme="dark"] .card-subtitle {
+  color: var(--ql-text-secondary) !important;
+}
+
+/* List group */
+[data-theme="dark"] .list-group-item {
+  background-color: var(--ql-card-bg) !important;
+  color: var(--ql-text-primary) !important;
+  border-color: var(--ql-border-color) !important;
+}
+
+/* Nav items */
+[data-theme="dark"] .nav-link {
+  color: var(--ql-text-primary) !important;
+}
+
+[data-theme="dark"] .nav-link:hover {
+  color: var(--ql-brand-primary) !important;
+}
+
+/* Small text */
+[data-theme="dark"] small {
+  color: var(--ql-text-secondary) !important;
+}
+
+[data-theme="dark"] small.text-muted {
+  color: var(--ql-text-muted) !important;
+}
+
+/* Pagination in dark mode */
+[data-theme="dark"] .pagination .page-link {
+  background-color: var(--ql-card-bg) !important;
+  color: var(--ql-text-primary) !important;
+  border-color: var(--ql-border-color) !important;
+}
+
+[data-theme="dark"] .pagination .page-item.active .page-link {
+  background-color: var(--ql-brand-primary) !important;
+  border-color: var(--ql-brand-primary) !important;
+}
+
+[data-theme="dark"] .pagination .page-item.disabled .page-link {
+  background-color: var(--ql-bg-secondary) !important;
+  color: var(--ql-text-muted) !important;
+}
+
+/* Input groups in dark mode */
+[data-theme="dark"] .input-group-text {
+  background-color: var(--ql-bg-tertiary) !important;
+  color: var(--ql-text-secondary) !important;
+  border-color: var(--ql-input-border) !important;
+}
+
+/* Tables in dark mode */
+[data-theme="dark"] .table {
+  color: var(--ql-text-primary) !important;
+}
+
+[data-theme="dark"] .table thead th {
+  background-color: var(--ql-bg-secondary) !important;
+  color: var(--ql-text-primary) !important;
+  border-color: var(--ql-border-color) !important;
+}
+
+[data-theme="dark"] .table tbody tr {
+  background-color: var(--ql-card-bg) !important;
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+  background-color: var(--ql-bg-tertiary) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CRITICAL: Text Muted Override - Must Override Bootstrap
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* High specificity overrides for .text-muted */
+body .text-muted,
+html .text-muted,
+.container .text-muted,
+.card .text-muted,
+p.text-muted,
+span.text-muted,
+small.text-muted,
+div.text-muted,
+a.text-muted,
+td.text-muted,
+th.text-muted,
+li.text-muted,
+label.text-muted {
+  color: var(--ql-text-muted) !important;
+}
+
+/* Ensure it works in dark mode specifically */
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] p.text-muted,
+[data-theme="dark"] span.text-muted,
+[data-theme="dark"] small.text-muted,
+[data-theme="dark"] div.text-muted,
+[data-theme="dark"] a.text-muted {
+  color: var(--ql-text-muted) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Smooth Transitions
+   ═══════════════════════════════════════════════════════════════════════════ */
+* {
+  transition-property: background-color, border-color, color, fill;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+/* Exclude animations and transforms from the global transition */
+*:not(.animate):not([class*="transition-"]) {
+  transition-property: background-color, border-color, color, fill;
+}
