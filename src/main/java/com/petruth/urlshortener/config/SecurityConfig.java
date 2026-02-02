@@ -27,8 +27,42 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/", "/api/shorten", "/api/{code}", "/login", "/css/**", "/js/**", "/error", "/payment/webhook","/QuickLink_Privacy_Policy.docx", "/QuickLink_Terms_of_Service.docx","/ads.txt").permitAll();
-                    auth.requestMatchers("/dashboard/**", "/subscription", "/analytics/**", "/api/analytics/**", "/actuator/**", "/payment/**").authenticated();
+                    auth.requestMatchers(
+                            "/",
+                            "/login",
+                            "/error",
+                            "/css/**",
+                            "/js/**",
+                            "/favicon.ico",
+
+                            // public API
+                            "/api/shorten",
+                            "/api/{code}",
+
+                            // legal & ads
+                            "/terms-of-service.html",
+                            "/privacy-policy.html",
+                            "/ads.txt",
+
+                            // swagger UI & docs
+                            "/swagger-ui.html",
+                            "/swagger-ui/**",
+                            "/v3/api-docs",
+                            "/v3/api-docs/**",
+
+                            // webhooks
+                            "/payment/webhook"
+                    ).permitAll();
+
+                    auth.requestMatchers(
+                            "/dashboard/**",
+                            "/subscription",
+                            "/analytics/**",
+                            "/api/analytics/**",
+                            "/payment/**",
+                            "/actuator/**"
+                    ).authenticated();
+
                     auth.anyRequest().authenticated();
                 })
                 .oauth2Login(oauth2 -> oauth2
