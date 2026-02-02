@@ -1,5 +1,5 @@
 package com.petruth.urlshortener.config;
-
+import com.petruth.urlshortener.interceptor.AdInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

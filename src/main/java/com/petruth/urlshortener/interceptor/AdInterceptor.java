@@ -1,4 +1,4 @@
-package com.petruth.urlshortener.config;
+package com.petruth.urlshortener.interceptor;
 
 import com.petruth.urlshortener.entity.User;
 import com.petruth.urlshortener.service.UserService;
