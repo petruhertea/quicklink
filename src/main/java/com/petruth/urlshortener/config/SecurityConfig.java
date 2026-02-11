@@ -39,10 +39,11 @@ public class SecurityConfig {
                             "/api/shorten",
                             "/api/{code}",
 
-                            // legal & ads
+                            // legal & fragment
                             "/terms-of-service.html",
                             "/privacy-policy.html",
                             "/ads.txt",
+                            "/updates",
 
                             // swagger UI & docs
                             "/swagger-ui.html",

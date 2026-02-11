@@ -49,6 +49,11 @@
   --ql-info:             #0dcaf0;
 }
 
+[data-theme="light"] {
+    --ql-footer-bg: #fff;
+    --ql-footer-text: #1f1f1f;
+}
+
 [data-theme="dark"] {
   /* ─── Dark Mode ────────────────────────────────────────────────────────── */
   --ql-bg-primary:       #1a1d23;
@@ -75,6 +80,9 @@
   /* Adjusted brand colors for dark mode readability */
   --ql-brand-primary:    #7c8ef5;
   --ql-brand-secondary:  #8a5ab8;
+
+  --ql-footer-bg: #1f1f1f;
+  --ql-footer-text: #fff;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -85,6 +93,14 @@ body {
   background-color: var(--ql-bg-secondary) !important;
   color: var(--ql-text-primary) !important;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ─── Footer ─────────────────────────── */
+footer {
+    background-color: var(--ql-footer-bg); /* default dark bg */
+    color: var(--ql-footer-text);
+    padding: 1.5rem;
+    text-align: center;
 }
 
 /* ─── Cards ───────────────────────────────────────────────────────────────── */
@@ -576,6 +592,17 @@ a:hover {
 [data-theme="dark"] .table-hover tbody tr:hover {
   background-color: var(--ql-bg-tertiary) !important;
 }
+
+[data-theme="dark"] .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--ql-text);
+    --bs-table-border-color: var(--ql-border-color);
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+    background-color: rgba(255,255,255,0.05);
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
    CRITICAL: Text Muted Override - Must Override Bootstrap

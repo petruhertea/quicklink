@@ -75,31 +75,30 @@
    * Update Chart.js chart colors when theme changes
    */
   function updateChartColors(theme) {
-    if (typeof Chart === 'undefined') return;
+    if (typeof Chart === 'undefined' || !Chart.instances) return;
 
-    const isDark = theme === THEME_DARK;
+    const charts = Object.values(Chart.instances);
+    if (!charts.length) return;
+
+    const isDark = theme === 'dark';
     const textColor = isDark ? '#e9ecef' : '#212529';
-    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+    const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
 
-    // Update all existing charts
-    Chart.instances.forEach(chart => {
-      if (chart.options.scales) {
-        // Update scales text color
-        Object.keys(chart.options.scales).forEach(scaleKey => {
-          const scale = chart.options.scales[scaleKey];
-          if (scale.ticks) scale.ticks.color = textColor;
-          if (scale.grid) scale.grid.color = gridColor;
-        });
-      }
+    charts.forEach(chart => {
+      if (!chart.options?.scales) return;
 
-      // Update legend text color
-      if (chart.options.plugins && chart.options.plugins.legend) {
-        chart.options.plugins.legend.labels.color = textColor;
-      }
+      Object.values(chart.options.scales).forEach(scale => {
+        scale.ticks && (scale.ticks.color = textColor);
+        scale.grid && (scale.grid.color = gridColor);
+      });
+
+      chart.options?.plugins?.legend?.labels &&
+        (chart.options.plugins.legend.labels.color = textColor);
 
       chart.update();
     });
   }
+
 
   // ───────────────────────────────────────────────────────────────────────────
   // System Preference Change Listener

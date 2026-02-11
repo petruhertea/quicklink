@@ -131,16 +131,16 @@
     </div>
 
     <!-- Ad banner (hidden automatically for premium users via sec:authorize) -->
-    <div th:replace="~{ads/banner}"></div>
+    <div th:replace="~{fragment/banner}"></div>
 
     <!-- Time Period Selector -->
     <div class="analytics-card">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">Click History</h5>
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-sm btn-outline-primary" onclick="loadAnalytics(7)">7 Days</button>
-                <button type="button" class="btn btn-sm btn-outline-primary active" onclick="loadAnalytics(30)">30 Days</button>
-                <button type="button" class="btn btn-sm btn-outline-primary" onclick="loadAnalytics(90)">90 Days</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-days="7">7 Days</button>
+                <button type="button" class="btn btn-sm btn-outline-primary active" data-days="30">30 Days</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-days="90">90 Days</button>
             </div>
         </div>
         <div class="chart-container">
@@ -155,7 +155,8 @@
             <div class="col-md-6">
                 <div class="analytics-card">
                     <h5 class="mb-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-phone" viewBox="0 0 16 16">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-phone" viewBox="0 0 16 16">
                             <path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
                             <path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
                         </svg>
@@ -171,8 +172,10 @@
             <div class="col-md-6">
                 <div class="analytics-card">
                     <h5 class="mb-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-browser-chrome" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M16 8a8 8 0 0 1-7.022 7.94l1.902-7.098a3 3 0 0 0 .05-1.492A3 3 0 0 0 10.237 6h5.511A8 8 0 0 1 16 8M0 8a8 8 0 0 0 7.927 8l1.426-5.321a3 3 0 0 1-.723.255 3 3 0 0 1-1.743-.147 3 3 0 0 1-1.043-.7L.633 4.876A8 8 0 0 0 0 8m5.004-.167L1.108 3.936A8.003 8.003 0 0 1 15.418 5H8.066a3 3 0 0 0-1.252.243 2.99 2.99 0 0 0-1.81 2.59M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-browser-chrome" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                  d="M16 8a8 8 0 0 1-7.022 7.94l1.902-7.098a3 3 0 0 0 .05-1.492A3 3 0 0 0 10.237 6h5.511A8 8 0 0 1 16 8M0 8a8 8 0 0 0 7.927 8l1.426-5.321a3 3 0 0 1-.723.255 3 3 0 0 1-1.743-.147 3 3 0 0 1-1.043-.7L.633 4.876A8 8 0 0 0 0 8m5.004-.167L1.108 3.936A8.003 8.003 0 0 1 15.418 5H8.066a3 3 0 0 0-1.252.243 2.99 2.99 0 0 0-1.81 2.59M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
                         </svg>
                         Browsers
                     </h5>
@@ -186,7 +189,8 @@
         <!-- Referrers Table -->
         <div class="analytics-card">
             <h5 class="mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                     class="bi bi-link-45deg" viewBox="0 0 16 16">
                     <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
                     <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
                 </svg>
@@ -212,9 +216,11 @@
     </div>
 
     <!-- Upgrade prompt for free users -->
-    <div th:if="${!user.premium}" class="analytics-card text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+    <div th:if="${!user.premium}" class="analytics-card text-center"
+         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
         <h4 class="mb-3">🔒 Unlock Advanced Analytics</h4>
-        <p class="mb-4">Upgrade to Premium to access detailed insights including device breakdown, browser statistics, geographical data, and referrer tracking.</p>
+        <p class="mb-4">Upgrade to Premium to access detailed insights including device breakdown, browser statistics,
+            geographical data, and referrer tracking.</p>
         <form action="/payment/create-checkout-session" method="post">
             <button type="submit" class="btn btn-light btn-lg">
                 Upgrade to Premium - $5/month
@@ -232,35 +238,40 @@
     let devicesChart = null;
     let browsersChart = null;
 
+    document.querySelectorAll('.btn-group button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const days = parseInt(btn.dataset.days);
+        loadAnalytics(days, btn);
+        });
+    });
+
+
     // Load analytics data
-    async function loadAnalytics(days = 30) {
+    async function loadAnalytics(days = 30, btn) {
+        if (!urlCode) return;
+
         try {
             const response = await fetch(`/api/analytics/${urlCode}?days=${days}`);
             const data = await response.json();
 
-            // Update clicks chart
             updateClicksChart(data.dailyClicks);
 
             if (isPremium) {
-                // Update device chart
                 updateDevicesChart(data.devices);
-
-                // Update browsers chart
                 updateBrowsersChart(data.browsers);
-
-                // Update referrers table
                 updateReferrersTable(data.referrers);
             }
 
             // Update active button
-            document.querySelectorAll('.btn-group button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
+            document.querySelectorAll('.btn-group button').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
         } catch (error) {
             console.error('Error loading analytics:', error);
         }
     }
+
+
 
     function updateClicksChart(data) {
         const ctx = document.getElementById('clicksChart').getContext('2d');
@@ -395,5 +406,6 @@
     loadAnalytics(30);
 </script>
 <script src="/js/dark-mode.js"></script>
+<div th:replace="fragment/footer :: footer"></div>
 </body>
 </html>

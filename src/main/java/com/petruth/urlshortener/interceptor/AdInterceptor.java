@@ -20,9 +20,9 @@ import java.util.Optional;
  *
  * <p>Logic:
  * <ul>
- *   <li>Anonymous users          → ads shown</li>
- *   <li>Authenticated, free      → ads shown</li>
- *   <li>Authenticated, premium   → ads hidden</li>
+ *   <li>Anonymous users          → fragment shown</li>
+ *   <li>Authenticated, free      → fragment shown</li>
+ *   <li>Authenticated, premium   → fragment hidden</li>
  *   <li>Non-page responses (API / redirects with no MAV) → skipped entirely</li>
  * </ul>
  */
@@ -51,7 +51,7 @@ public class AdInterceptor implements HandlerInterceptor {
             return;
         }
 
-        boolean showAds = true; // default: show ads
+        boolean showAds = true; // default: show fragment
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {

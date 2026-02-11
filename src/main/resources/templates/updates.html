@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QuickLink – Updates</title>
+    <link rel="stylesheet" href="/css/dark-mode.css">
+    <style>
+        .updates-container {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 2rem 1rem;
+        }
+
+        .update-entry {
+          background: var(--ql-card-bg);
+          border: 1px solid var(--ql-border-color);
+          border-radius: 8px;
+          padding: 1rem 1.25rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .update-entry h2 {
+          margin-bottom: 0.25rem;
+        }
+
+        .update-entry time {
+          font-size: 0.85rem;
+          color: var(--ql-text-muted);
+        }
+
+        .update-entry ul {
+          margin-top: 0.75rem;
+          padding-left: 1.25rem;
+        }
+
+        .update-entry li {
+          margin-bottom: 0.5rem;
+        }
+
+
+    </style>
+</head>
+<body>
+    <main class="updates-container">
+        <h1>What’s new in QuickLink</h1>
+
+        <section class="update-entry">
+            <time datetime="2026-02-11">February 11, 2026</time>
+            <ul>
+                <li>Added update section into the app's footer</li>
+                <li>Fixed an issue where dark / light mode switch didn't work on the analytics page</li>
+            </ul>
+        </section>
+
+        <section class="update-entry">
+            <time datetime="2026-02-03">February 3, 2026</time>
+            <ul>
+                <li>Added dark / light mode switch</li>
+            </ul>
+        </section>
+
+        <section class="update-entry">
+            <time datetime="2026-02-01">February 1, 2026</time>
+            <ul>
+                <li>Released QuickLink to the public</li>
+            </ul>
+        </section>
+    </main>
+    <script src="/js/dark-mode.js"></script>
+</body>
+</html>

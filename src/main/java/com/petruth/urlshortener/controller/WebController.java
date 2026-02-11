@@ -286,4 +286,9 @@ public class WebController {
 
         return "subscription";
     }
+
+    @GetMapping("/updates")
+    public String updates(){
+        return "updates";
+    }
 }

@@ -127,7 +127,7 @@
     </nav>
 
     <!-- Show the ad banner (hidden automatically for premium users) -->
-    <div th:replace="~{ads/banner}"></div>
+    <div th:replace="~{fragment/banner}"></div>
 
     <!-- Hero Section -->
     <div class="hero-section">
@@ -351,5 +351,6 @@
       });
     </script>
     <script src="/js/dark-mode.js"></script>
+    <div th:replace="fragment/footer :: footer"></div>
   </body>
 </html>
