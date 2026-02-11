@@ -1,13 +1,1 @@
-# ads.txt – Authorized Digital Sellers
-# ──────────────────────────────────────
-# This file must be served at the ROOT of your domain:
-#   https://yourdomain.com/ads.txt
-#
-# Replace the placeholder publisher ID below with your real one.
-# You can find it in: AdSense Dashboard → Sites → copy the snippet.
-# Format: google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
-#
-# The fourth field (f08c47fec0942fa0) is Google's certification authority
-# identifier and must NOT be changed.
-
 google.com, pub-8319917367585912, DIRECT, f08c47fec0942fa0
