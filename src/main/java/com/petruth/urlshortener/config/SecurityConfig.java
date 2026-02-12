@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
+import org.springframework.core.annotation.Order;
 
 @Configuration
 @EnableWebSecurity
@@ -24,6 +25,21 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Order(1)
+    SecurityFilterChain actuatorSecurity(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/actuator/**")
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
+                )
+                .csrf(csrf -> csrf.disable());
+
+        return http.build();
+    }
+
+
+    @Bean
+    @Order(2)
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> {
@@ -60,9 +76,11 @@ public class SecurityConfig {
                             "/subscription",
                             "/analytics/**",
                             "/api/analytics/**",
-                            "/payment/**",
-                            "/actuator/**"
+                            "/payment/**"
                     ).authenticated();
+
+                    //actuator public endpoint
+                    auth.requestMatchers("/actuator/health").permitAll();
 
                     auth.anyRequest().authenticated();
                 })
