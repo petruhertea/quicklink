@@ -31,13 +31,6 @@ public class AnalyticsService {
         analytics.setUserAgent(request.getHeader("User-Agent"));
         analytics.setReferer(extractDomain(request.getHeader("Referer")));
 
-        // Temporary - remove after debugging
-        System.out.println("=== GEO DEBUG ===");
-        System.out.println("Remote addr: " + request.getRemoteAddr());
-        System.out.println("X-Forwarded-For: " + request.getHeader("X-Forwarded-For"));
-        System.out.println("Extracted IP: " + ipAddress);
-        System.out.println("=================");
-
         String userAgent = request.getHeader("User-Agent");
         if (userAgent != null) {
             analytics.setDeviceType(detectDeviceType(userAgent));
@@ -72,14 +65,12 @@ public class AnalyticsService {
 
         try {
             String url = String.format(GEO_API_URL, ipAddress);
-            System.out.println("GEO: Calling URL: " + url);
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
             System.out.println("GEO: Response: " + response);
 
             if (response != null && Boolean.TRUE.equals(response.get("success"))) {
                 result.put("country", (String) response.get("country"));
                 result.put("city", (String) response.get("city"));
-                System.out.println("GEO: Success - " + result.get("country") + ", " + result.get("city"));
             } else {
                 System.out.println("GEO: Failed - success flag was false or response was null");
             }
