@@ -31,6 +31,13 @@ public class AnalyticsService {
         analytics.setUserAgent(request.getHeader("User-Agent"));
         analytics.setReferer(extractDomain(request.getHeader("Referer")));
 
+        // Temporary - remove after debugging
+        System.out.println("=== GEO DEBUG ===");
+        System.out.println("Remote addr: " + request.getRemoteAddr());
+        System.out.println("X-Forwarded-For: " + request.getHeader("X-Forwarded-For"));
+        System.out.println("Extracted IP: " + ipAddress);
+        System.out.println("=================");
+
         String userAgent = request.getHeader("User-Agent");
         if (userAgent != null) {
             analytics.setDeviceType(detectDeviceType(userAgent));
