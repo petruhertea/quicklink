@@ -6,6 +6,7 @@ import com.petruth.urlshortener.repository.ClickAnalyticsRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -19,15 +20,17 @@ public class AnalyticsService {
     public AnalyticsService(ClickAnalyticsRepository analyticsRepository) {
         this.analyticsRepository = analyticsRepository;
     }
+
     @Async
     public void recordClick(ShortenedUrl url, HttpServletRequest request) {
         ClickAnalytics analytics = new ClickAnalytics();
         analytics.setShortenedUrl(url);
-        analytics.setIpAddress(getClientIP(request));
-        analytics.setUserAgent(request.getHeader("User-Agent"));
-        analytics.setReferer(request.getHeader("Referer"));
 
-        // Parse user agent for device, browser, OS
+        String ipAddress = getClientIP(request);
+        analytics.setIpAddress(ipAddress);
+        analytics.setUserAgent(request.getHeader("User-Agent"));
+        analytics.setReferer(extractDomain(request.getHeader("Referer")));
+
         String userAgent = request.getHeader("User-Agent");
         if (userAgent != null) {
             analytics.setDeviceType(detectDeviceType(userAgent));
@@ -35,10 +38,58 @@ public class AnalyticsService {
             analytics.setOs(detectOS(userAgent));
         }
 
-        // Note: For geolocation, you'd need a service like MaxMind GeoIP2
-        // For now, we'll leave country/city as null or use a simple implementation
+        // Geolocation
+        Map<String, String> geo = getGeolocation(ipAddress);
+        analytics.setCountry(geo.get("country"));
+        analytics.setCity(geo.get("city"));
 
         analyticsRepository.save(analytics);
+    }
+
+    private static final String GEO_API_URL = "https://ipwho.is/%s";
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    private Map<String, String> getGeolocation(String ipAddress) {
+        Map<String, String> result = new HashMap<>();
+        result.put("country", null);
+        result.put("city", null);
+
+        // Don't attempt geolocation for private/local IPs
+        if (ipAddress == null ||
+                ipAddress.equals("127.0.0.1") ||
+                ipAddress.startsWith("192.168.") ||
+                ipAddress.startsWith("10.") ||
+                ipAddress.equals("0:0:0:0:0:0:0:1")) {
+            return result;
+        }
+
+        try {
+            String url = String.format(GEO_API_URL, ipAddress);
+            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+
+            if (response != null && "success".equals(response.get("status"))) {
+                result.put("country", (String) response.get("country"));
+                result.put("city", (String) response.get("city"));
+            }
+        } catch (Exception e) {
+            System.out.println("Geolocation lookup failed for IP {"+ipAddress+"}:" + "{"+e.getMessage()+"}");
+        }
+
+        return result;
+    }
+
+    private String extractDomain(String referer) {
+        if (referer == null || referer.trim().isEmpty()) {
+            return "Direct";
+        }
+        try {
+            java.net.URL url = new java.net.URL(referer);
+            String host = url.getHost();
+            // Strip www. prefix
+            return host.startsWith("www.") ? host.substring(4) : host;
+        } catch (Exception e) {
+            return "Direct";
+        }
     }
 
     public Map<String, Object> getAnalyticsForUrl(ShortenedUrl url, int days) {

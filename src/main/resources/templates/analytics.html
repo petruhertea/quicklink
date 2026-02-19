@@ -213,6 +213,29 @@
                 </table>
             </div>
         </div>
+
+        <!-- Country Breakdown -->
+        <div th:if="${user.premium}" class="analytics-card">
+            <h5 class="mb-3">
+                🌍 Top Countries
+            </h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Country</th>
+                        <th class="text-end">Clicks</th>
+                        <th class="text-end">Percentage</th>
+                    </tr>
+                    </thead>
+                    <tbody id="countriesTable">
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">Loading...</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- Upgrade prompt for free users -->
@@ -260,6 +283,7 @@
                 updateDevicesChart(data.devices);
                 updateBrowsersChart(data.browsers);
                 updateReferrersTable(data.referrers);
+                updateCountriesTable(data.countries);
             }
 
             // Update active button
@@ -388,6 +412,29 @@
 
         if (!data || data.length === 0) {
             tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No referrer data available</td></tr>';
+            return;
+        }
+
+        const total = data.reduce((sum, d) => sum + parseInt(d.count), 0);
+
+        tbody.innerHTML = data.slice(0, 10).map(d => `
+            <tr>
+                <td>
+                    ${d.label === 'Direct'
+                        ? '<span class="badge bg-secondary">Direct / Unknown</span>'
+                        : `<a href="https://${d.label}" target="_blank">${d.label}</a>`}
+                </td>
+                <td class="text-end"><strong>${d.count}</strong></td>
+                <td class="text-end">${((d.count / total) * 100).toFixed(1)}%</td>
+            </tr>
+        `).join('');
+    }
+
+    function updateCountriesTable(data) {
+        const tbody = document.getElementById('countriesTable');
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No country data available yet</td></tr>';
             return;
         }
 

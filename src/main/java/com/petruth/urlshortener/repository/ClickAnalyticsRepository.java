@@ -35,9 +35,9 @@ public interface ClickAnalyticsRepository extends JpaRepository<ClickAnalytics, 
             "GROUP BY c.browser ORDER BY count DESC")
     List<Object[]> getClicksByBrowser(@Param("url") ShortenedUrl url);
 
-    @Query("SELECT c.referer, COUNT(c) as count FROM ClickAnalytics c " +
-            "WHERE c.shortenedUrl = :url AND c.referer IS NOT NULL " +
-            "GROUP BY c.referer ORDER BY count DESC")
+    @Query("SELECT COALESCE(c.referer, 'Direct') as referer, COUNT(c) as count " +
+            "FROM ClickAnalytics c WHERE c.shortenedUrl = :url " +
+            "GROUP BY COALESCE(c.referer, 'Direct') ORDER BY count DESC")
     List<Object[]> getClicksByReferer(@Param("url") ShortenedUrl url);
 
     long countByShortenedUrlAndClickedAtAfter(ShortenedUrl url, LocalDateTime date);

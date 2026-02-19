@@ -24,22 +24,8 @@ public class SecurityConfig {
         this.customOAuth2UserService = customOAuth2UserService;
     }
 
-    @Bean
-    @Order(1)
-    SecurityFilterChain actuatorSecurity(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/actuator/**")
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
-                )
-                .csrf(csrf -> csrf.disable());
-
-        return http.build();
-    }
-
 
     @Bean
-    @Order(2)
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> {
@@ -66,6 +52,9 @@ public class SecurityConfig {
                             "/swagger-ui/**",
                             "/v3/api-docs",
                             "/v3/api-docs/**",
+
+                            // Actuator Endpoints
+                            "/actuator/**",
 
                             // webhooks
                             "/payment/webhook"
