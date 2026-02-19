@@ -61,25 +61,30 @@ public class AnalyticsService {
         result.put("country", null);
         result.put("city", null);
 
-        // Don't attempt geolocation for private/local IPs
         if (ipAddress == null ||
                 ipAddress.equals("127.0.0.1") ||
                 ipAddress.startsWith("192.168.") ||
                 ipAddress.startsWith("10.") ||
                 ipAddress.equals("0:0:0:0:0:0:0:1")) {
+            System.out.println("GEO: Skipped private/local IP: " + ipAddress);
             return result;
         }
 
         try {
             String url = String.format(GEO_API_URL, ipAddress);
+            System.out.println("GEO: Calling URL: " + url);
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+            System.out.println("GEO: Response: " + response);
 
-            if (response != null && "success".equals(response.get("status"))) {
+            if (response != null && Boolean.TRUE.equals(response.get("success"))) {
                 result.put("country", (String) response.get("country"));
                 result.put("city", (String) response.get("city"));
+                System.out.println("GEO: Success - " + result.get("country") + ", " + result.get("city"));
+            } else {
+                System.out.println("GEO: Failed - success flag was false or response was null");
             }
         } catch (Exception e) {
-            System.out.println("Geolocation lookup failed for IP {"+ipAddress+"}:" + "{"+e.getMessage()+"}");
+            System.out.println("GEO: Exception - " + e.getClass().getSimpleName() + ": " + e.getMessage());
         }
 
         return result;
