@@ -57,3 +57,17 @@ services:
 
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
         value: validate
+
+      # --- Spring Mail -----------------------------------
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_PORT
+        sync: false
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: APP_TOKEN_EXTENSION_SECRET
+        sync: false

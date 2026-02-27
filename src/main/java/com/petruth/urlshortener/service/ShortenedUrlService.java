@@ -7,9 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ShortenedUrlService {
     String generateUniqueCode();
+    Optional<ShortenedUrl> findById(Long id);
     ShortenedUrl save(ShortenedUrl shortenedUrl);
     ShortenedUrl findByCode(String code);
     List<ShortenedUrl> findByUser(User user);

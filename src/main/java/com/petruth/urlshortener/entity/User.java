@@ -27,6 +27,12 @@ public class User {
     @Column(nullable = false)
     private boolean premium = false;
 
+    @Column(nullable = false)
+    private boolean notifyExpiringLinks = false;
+
+    @Column(nullable = false)
+    private boolean notificationPromptShown = false;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShortenedUrl> urls = new ArrayList<>();
 
@@ -54,6 +60,22 @@ public class User {
 
     public boolean isPremium() { return premium; }
     public void setPremium(boolean premium) { this.premium = premium; }
+
+    public boolean isNotifyExpiringLinks() {
+        return notifyExpiringLinks;
+    }
+
+    public void setNotifyExpiringLinks(boolean notifyExpiringLinks) {
+        this.notifyExpiringLinks = notifyExpiringLinks;
+    }
+
+    public boolean isNotificationPromptShown() {
+        return notificationPromptShown;
+    }
+
+    public void setNotificationPromptShown(boolean notificationPromptShown) {
+        this.notificationPromptShown = notificationPromptShown;
+    }
 
     public List<ShortenedUrl> getUrls() { return urls; }
     public void setUrls(List<ShortenedUrl> urls) { this.urls = urls; }

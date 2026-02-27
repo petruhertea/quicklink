@@ -4,6 +4,8 @@ import com.petruth.urlshortener.service.CustomOAuth2UserService;
 import com.petruth.urlshortener.service.CustomOidcUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -17,11 +19,14 @@ public class SecurityConfig {
 
     private final CustomOidcUserService customOidcUserService;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final Environment environment;
 
     public SecurityConfig(CustomOidcUserService customOidcUserService,
-                          CustomOAuth2UserService customOAuth2UserService) {
+                          CustomOAuth2UserService customOAuth2UserService,
+                          Environment environment) {
         this.customOidcUserService = customOidcUserService;
         this.customOAuth2UserService = customOAuth2UserService;
+        this.environment = environment;
     }
 
 
@@ -35,7 +40,7 @@ public class SecurityConfig {
                             "/error",
                             "/css/**",
                             "/js/**",
-                            "/favicon.ico",
+                            "/assets/quicklink-logo.ico",
 
                             // public API
                             "/api/shorten",
@@ -57,8 +62,20 @@ public class SecurityConfig {
                             "/actuator/**",
 
                             // webhooks
-                            "/payment/webhook"
+                            "/payment/webhook",
+
+                            // "/dev/**",
+
+                            // email notifications
+                            "/links/extend"
                     ).permitAll();
+
+                    auth.requestMatchers("/dev/**").access((authentication, context) -> {
+                        // Only permit if the dev profile is active
+                        String profiles = environment.getProperty("spring.profiles.active", "");
+                        boolean isDev = profiles.contains("dev");
+                        return new AuthorizationDecision(isDev);
+                    });
 
                     auth.requestMatchers(
                             "/dashboard/**",
@@ -92,7 +109,7 @@ public class SecurityConfig {
                         .maxSessionsPreventsLogin(false)
                 )
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**", "/payment/**")
+                        .ignoringRequestMatchers("/api/**", "/payment/**", "/dev/**")
                 )
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)

@@ -19,7 +19,9 @@ public interface ShortenedUrlRepository extends JpaRepository<ShortenedUrl, Long
 
     // ===== EXISTING METHODS =====
     boolean existsByCode(String code);
+
     Optional<ShortenedUrl> findByCode(String code);
+
     Optional<List<ShortenedUrl>> findByUser(User user);
 
     @Modifying
@@ -51,10 +53,28 @@ public interface ShortenedUrlRepository extends JpaRepository<ShortenedUrl, Long
 
     // Count methods - no need for custom queries
     long countByUser(User user);
+
     long countByUserAndExpiresAtBefore(User user, LocalDateTime date);
+
     long countByUserAndExpiresAtAfter(User user, LocalDateTime date);
+
     long countByUserAndExpiresAtIsNull(User user);
 
     // Add paginated version
     Page<ShortenedUrl> findAll(Specification<ShortenedUrl> spec, Pageable pageable);
+
+    @Query("""
+            SELECT s FROM ShortenedUrl s
+            JOIN s.user u
+            WHERE s.expiresAt IS NOT NULL
+              AND s.expiresAt BETWEEN :now AND :threshold
+              AND s.expiryNotificationSentAt IS NULL
+              AND u.notifyExpiringLinks = true
+            """)
+    List<ShortenedUrl> findLinksExpiringBefore(
+            @Param("now") LocalDateTime now,
+            @Param("threshold") LocalDateTime threshold);
+
+    // Also add this for the extension token endpoint:
+    Optional<ShortenedUrl> findByIdAndUserId(Long id, Long userId);
 }

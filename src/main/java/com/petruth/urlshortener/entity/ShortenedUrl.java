@@ -39,6 +39,9 @@ public class ShortenedUrl {
     @Column(name = "last_accessed")
     private LocalDateTime lastAccessed;
 
+    @Column(name = "expiry_notification_sent_at")
+    private LocalDateTime expiryNotificationSentAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -127,6 +130,14 @@ public class ShortenedUrl {
 
     public void setExpiresAt(LocalDateTime expiresAt) {
         this.expiresAt = expiresAt;
+    }
+
+    public LocalDateTime getExpiryNotificationSentAt() {
+        return expiryNotificationSentAt;
+    }
+
+    public void setExpiryNotificationSentAt(LocalDateTime expiryNotificationSentAt) {
+        this.expiryNotificationSentAt = expiryNotificationSentAt;
     }
 
     public User getUser() {
