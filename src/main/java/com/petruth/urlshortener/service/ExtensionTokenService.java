@@ -13,7 +13,7 @@ import java.util.Base64;
 public class ExtensionTokenService {
 
     // Reuses APP_URL secret as HMAC key — add a dedicated secret in production
-    @Value("${app.extension.token.secret:changeme-use-env-var}")
+    @Value("${app.extension.token.secret}")
     private String secret;
 
     // Tokens are valid for 7 days

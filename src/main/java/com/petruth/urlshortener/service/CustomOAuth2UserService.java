@@ -34,11 +34,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserService userService;
     private final UserOAuthProviderRepository oauthProviderRepository;
     private final RestTemplate restTemplate = new RestTemplate();
+    private final WelcomeEmailService welcomeEmailService;
 
     public CustomOAuth2UserService(UserService userService,
-                                   UserOAuthProviderRepository oauthProviderRepository) {
+                                   UserOAuthProviderRepository oauthProviderRepository,
+                                   WelcomeEmailService welcomeEmailService) {
         this.userService = userService;
         this.oauthProviderRepository = oauthProviderRepository;
+        this.welcomeEmailService = welcomeEmailService;
     }
 
     @Override
@@ -154,6 +157,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 user.setProfilePicture(picture);
                 user = userService.save(user);
                 log.info("Created new user with ID: {}", user.getId());
+
+                welcomeEmailService.sendWelcomeEmail(user);
             } else {
                 log.info("Found existing user by email, ID: {}, linking new OAuth provider", user.getId());
 
@@ -229,7 +234,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
                     request,
-                    new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                    }
             );
 
             List<Map<String, Object>> emails = response.getBody();

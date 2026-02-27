@@ -28,11 +28,14 @@ public class CustomOidcUserService extends OidcUserService {
 
     private final UserService userService;
     private final UserOAuthProviderRepository oauthProviderRepository;
+    private final WelcomeEmailService welcomeEmailService;
 
     public CustomOidcUserService(UserService userService,
-                                 UserOAuthProviderRepository oauthProviderRepository) {
-        this.userService = userService;
+                                 UserOAuthProviderRepository oauthProviderRepository,
+                                 WelcomeEmailService welcomeEmailService) {
+        this.userService             = userService;
         this.oauthProviderRepository = oauthProviderRepository;
+        this.welcomeEmailService     = welcomeEmailService;
     }
 
     @Override
@@ -150,6 +153,8 @@ public class CustomOidcUserService extends OidcUserService {
                 user.setProfilePicture(picture);
                 user = userService.save(user);
                 log.info("Created new user with ID: {}", user.getId());
+
+                welcomeEmailService.sendWelcomeEmail(user);
             } else {
                 log.info("Found existing user by email, ID: {}, linking new OAuth provider", user.getId());
 

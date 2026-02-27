@@ -1,9 +1,11 @@
 package com.petruth.urlshortener.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petruth.urlshortener.service.CustomOAuth2UserService;
 import com.petruth.urlshortener.service.CustomOidcUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,14 +23,13 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final Environment environment;
 
-    public SecurityConfig(CustomOidcUserService customOidcUserService,
-                          CustomOAuth2UserService customOAuth2UserService,
+    public SecurityConfig(@Lazy CustomOidcUserService customOidcUserService,
+                          @Lazy CustomOAuth2UserService customOAuth2UserService,
                           Environment environment) {
         this.customOidcUserService = customOidcUserService;
         this.customOAuth2UserService = customOAuth2UserService;
         this.environment = environment;
     }
-
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
