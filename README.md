@@ -271,6 +271,30 @@ Managed by **Flyway** – migrations in `src/main/resources/db/migration/`
 
 ---
 
+## 📧 Email System
+
+### Welcome Email
+Triggered automatically on first OAuth login. Sent asynchronously so a
+mail failure never blocks the login flow. Covers key features and a
+non-intrusive premium callout.
+
+### Expiry Notifications
+- Scheduled daily at 9 AM via `LinkExpiryNotificationService`
+- Queries links expiring within 3 days belonging to opted-in users
+- Stamps `expiry_notification_sent_at` to prevent duplicate sends
+- Email contains a signed, 7-day-valid one-click extend link
+- Extending resets `expiry_notification_sent_at` so the cycle repeats
+  if the user approaches the new deadline
+
+### Dev Testing
+With `SPRING_PROFILES_ACTIVE=dev`, a test endpoint is available:
+```bash
+curl -X POST http://localhost:8080/dev/trigger-expiry-notifications
+```
+This endpoint is compiled out entirely in production via `@Profile("dev")`.
+
+---
+
 ## 💳 Stripe Integration
 
 ### Checkout Flow
@@ -368,6 +392,7 @@ This project is licensed under the **MIT License** – see [LICENSE](LICENSE) fo
 - [Supabase](https://supabase.com) – PostgreSQL hosting
 - [Bootstrap](https://getbootstrap.com) – UI framework
 - [Chart.js](https://www.chartjs.org) – Analytics visualizations
+- [Brevo](https://app.brevo.com/) - Email Notifications
 
 ---
 
