@@ -62,7 +62,7 @@ public class ShortenUrlController {
                     .header("Content-Disposition", "inline; filename=\"qrcode-" + code + ".png\"")
                     .body(qrCode);
 
-        } catch (Exception e) {
+        } catch (Exception _) {
             return ResponseEntity.internalServerError().build();
         }
     }

@@ -43,8 +43,8 @@ A modern, production-ready URL shortening service built with Spring Boot, featur
 
 | Layer | Technology                                                  |
 |-------|-------------------------------------------------------------|
-| **Backend** | Spring Boot 4.x (Java 17), Spring Security, Spring Data JPA |
-| **Database** | PostgreSQL 16 (Supabase)                   |
+| **Backend** | Spring Boot 4.x (Java 25), Spring Security, Spring Data JPA |
+| **Database** | PostgreSQL 16 (Supabase)                                    |
 | **Migrations** | Flyway                                                      |
 | **Authentication** | OAuth2 (GitHub, Google, Microsoft)                          |
 | **Payments** | Stripe Checkout & Subscriptions                             |

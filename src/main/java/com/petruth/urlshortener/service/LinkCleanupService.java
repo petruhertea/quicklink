@@ -27,7 +27,7 @@ public class LinkCleanupService {
         long deleted = shortenedUrlRepository.deleteByExpiresAtBefore(cutoff);
 
         if (deleted > 0) {
-            System.out.println("Deleted " + deleted + " expired links");
+            IO.println("Deleted " + deleted + " expired links");
         }
     }
 }

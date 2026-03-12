@@ -59,23 +59,23 @@ public class AnalyticsService {
                 ipAddress.startsWith("192.168.") ||
                 ipAddress.startsWith("10.") ||
                 ipAddress.equals("0:0:0:0:0:0:0:1")) {
-            System.out.println("GEO: Skipped private/local IP: " + ipAddress);
+            IO.println("GEO: Skipped private/local IP: " + ipAddress);
             return result;
         }
 
         try {
-            String url = String.format(GEO_API_URL, ipAddress);
+            String url = GEO_API_URL.formatted(ipAddress);
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-            System.out.println("GEO: Response: " + response);
+            IO.println("GEO: Response: " + response);
 
             if (response != null && Boolean.TRUE.equals(response.get("success"))) {
                 result.put("country", (String) response.get("country"));
                 result.put("city", (String) response.get("city"));
             } else {
-                System.out.println("GEO: Failed - success flag was false or response was null");
+                IO.println("GEO: Failed - success flag was false or response was null");
             }
         } catch (Exception e) {
-            System.out.println("GEO: Exception - " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            IO.println("GEO: Exception - " + e.getClass().getSimpleName() + ": " + e.getMessage());
         }
 
         return result;
@@ -90,7 +90,7 @@ public class AnalyticsService {
             String host = url.getHost();
             // Strip www. prefix
             return host.startsWith("www.") ? host.substring(4) : host;
-        } catch (Exception e) {
+        } catch (Exception _) {
             return "Direct";
         }
     }

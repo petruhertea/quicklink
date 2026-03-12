@@ -52,7 +52,7 @@ public class ExtensionTokenService {
             if (!sig.equals(expectedSig)) return java.util.Optional.empty();
 
             return java.util.Optional.of(urlId);
-        } catch (Exception e) {
+        } catch (Exception _) {
             return java.util.Optional.empty();
         }
     }

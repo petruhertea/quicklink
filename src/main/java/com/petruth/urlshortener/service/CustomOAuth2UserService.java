@@ -264,7 +264,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 }
 
                 // Last resort: use first email
-                String email = (String) emails.get(0).get("email");
+                String email = (String) emails.getFirst().get("email");
                 log.warn("Using first GitHub email (not verified): {}", email);
                 return email;
             }

@@ -81,7 +81,7 @@ public class UrlSafetyService {
 
             return true;
 
-        } catch (Exception e) {
+        } catch (Exception _) {
             return false;
         }
     }
@@ -105,7 +105,7 @@ public class UrlSafetyService {
                         host.startsWith("192.168.") || host.startsWith("10.")) {
                     return "Internal/private URLs cannot be shortened";
                 }
-            } catch (Exception e) {
+            } catch (Exception _) {
                 // Fall through
             }
 

@@ -77,7 +77,7 @@ public class PaymentController {
 
         try {
             event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
-        } catch (SignatureVerificationException e) {
+        } catch (SignatureVerificationException _) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
         }
 
@@ -105,7 +105,7 @@ public class PaymentController {
                 break;
 
             default:
-                System.out.println("Unhandled event type: " + event.getType());
+                IO.println("Unhandled event type: " + event.getType());
         }
 
         return ResponseEntity.ok("Success");
@@ -114,14 +114,14 @@ public class PaymentController {
     private void handleSuccessfulPayment(Session session) {
         String userId = session.getMetadata().get("userId");
         if (userId == null) {
-            System.out.println("No userId in session metadata");
+            IO.println("No userId in session metadata");
             return;
         }
 
         userService.findById(Long.parseLong(userId)).ifPresent(user -> {
             user.setPremium(true);
             userService.save(user);
-            System.out.println("User " + user.getEmail() + " upgraded to premium");
+            IO.println("User " + user.getEmail() + " upgraded to premium");
         });
     }
 
@@ -135,7 +135,7 @@ public class PaymentController {
             if (user != null) {
                 user.setPremium(false);
                 userService.save(user);
-                System.out.println("User " + user.getEmail() + " downgraded from premium");
+                IO.println("User " + user.getEmail() + " downgraded from premium");
             }
         }
     }

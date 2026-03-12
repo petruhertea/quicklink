@@ -71,7 +71,7 @@ public class SecurityConfig {
                             "/links/extend"
                     ).permitAll();
 
-                    auth.requestMatchers("/dev/**").access((authentication, context) -> {
+                    auth.requestMatchers("/dev/**").access((_, _) -> {
                         // Only permit if the dev profile is active
                         String profiles = environment.getProperty("spring.profiles.active", "");
                         boolean isDev = profiles.contains("dev");

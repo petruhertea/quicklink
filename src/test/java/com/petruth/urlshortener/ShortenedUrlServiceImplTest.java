@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -209,7 +210,7 @@ class ShortenedUrlServiceImplTest {
         assertNotNull(result);
         assertEquals(2, result.getTotalElements());
         assertEquals(2, result.getContent().size());
-        assertEquals(testUrl.getCode(), result.getContent().get(0).getCode());
+        assertEquals(testUrl.getCode(), result.getContent().getFirst().getCode());
         verify(repository, times(1)).findByUser(testUser, pageable);
     }
 
@@ -228,7 +229,7 @@ class ShortenedUrlServiceImplTest {
         assertNotNull(result);
         assertEquals(2, result.getTotalElements());
         verify(repository, times(1)).findByUser(testUser, pageable);
-        verify(repository, never()).searchByTerm(any(), anyString(), any());
+        verify(repository).findAll(any(Specification.class), eq(pageable));
     }
 
     @Test
@@ -238,7 +239,7 @@ class ShortenedUrlServiceImplTest {
         List<ShortenedUrl> urls = Arrays.asList(testUrl);
         Page<ShortenedUrl> page = new PageImpl<>(urls, pageable, urls.size());
 
-        when(repository.searchByTerm(testUser, searchTerm, pageable)).thenReturn(page);
+        when(repository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
 
         // When
         Page<ShortenedUrl> result = service.searchLinks(testUser, searchTerm, pageable);
@@ -246,8 +247,8 @@ class ShortenedUrlServiceImplTest {
         // Then
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertEquals("abc123", result.getContent().get(0).getCode());
-        verify(repository, times(1)).searchByTerm(testUser, searchTerm, pageable);
+        assertEquals("abc123", result.getContent().getFirst().getCode());
+        verify(repository).findAll(any(Specification.class), eq(pageable));
         verify(repository, never()).findByUser(any(User.class), any(Pageable.class));
     }
 
@@ -285,15 +286,8 @@ class ShortenedUrlServiceImplTest {
         List<ShortenedUrl> urls = Arrays.asList(testUrl);
         Page<ShortenedUrl> page = new PageImpl<>(urls, pageable, urls.size());
 
-        when(repository.advancedSearch(
-                eq(testUser),
-                eq(request.searchTerm()),
-                eq(request.startDate()),
-                eq(request.endDate()),
-                eq(request.minClicks()),
-                eq(request.maxClicks()),
-                eq(pageable)
-        )).thenReturn(page);
+        when(repository.findAll(any(Specification.class), eq(pageable)))
+                .thenReturn(page);
 
         // When
         Page<ShortenedUrl> result = service.advancedSearchLinks(testUser, request, pageable);
@@ -301,15 +295,7 @@ class ShortenedUrlServiceImplTest {
         // Then
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        verify(repository, times(1)).advancedSearch(
-                testUser,
-                request.searchTerm(),
-                request.startDate(),
-                request.endDate(),
-                request.minClicks(),
-                request.maxClicks(),
-                pageable
-        );
+        verify(repository).findAll(any(Specification.class), eq(pageable));
     }
 
     @Test
@@ -333,7 +319,7 @@ class ShortenedUrlServiceImplTest {
         // Then
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertEquals("exp123", result.getContent().get(0).getCode());
+        assertEquals("exp123", result.getContent().getFirst().getCode());
         verify(repository, times(1)).findByUserAndExpiresAtBefore(
                 eq(testUser), any(LocalDateTime.class), eq(pageable));
     }
@@ -348,15 +334,8 @@ class ShortenedUrlServiceImplTest {
         List<ShortenedUrl> urls = Arrays.asList(testUrl, testUrl2);
         Page<ShortenedUrl> page = new PageImpl<>(urls, pageable, urls.size());
 
-        when(repository.advancedSearch(
-                eq(testUser),
-                isNull(),
-                isNull(),
-                isNull(),
-                isNull(),
-                isNull(),
-                eq(pageable)
-        )).thenReturn(page);
+        when(repository.findAll(any(Specification.class), eq(pageable)))
+                .thenReturn(page);
 
         // When
         Page<ShortenedUrl> result = service.findActiveLinks(testUser, pageable);
@@ -364,8 +343,7 @@ class ShortenedUrlServiceImplTest {
         // Then
         assertNotNull(result);
         assertEquals(2, result.getTotalElements());
-        verify(repository, times(1)).advancedSearch(
-                eq(testUser), isNull(), isNull(), isNull(), isNull(), isNull(), eq(pageable));
+        verify(repository).findAll(any(Specification.class), eq(pageable));
     }
 
     @Test

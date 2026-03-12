@@ -15,14 +15,14 @@ public class ShortenedUrlSpecifications {
      * Base specification - user must match
      */
     public static Specification<ShortenedUrl> belongsToUser(User user) {
-        return (root, query, cb) -> cb.equal(root.get("user"), user);
+        return (root, _, cb) -> cb.equal(root.get("user"), user);
     }
 
     /**
      * Search in code OR long_url (case-insensitive)
      */
     public static Specification<ShortenedUrl> searchByTerm(String searchTerm) {
-        return (root, query, cb) -> {
+        return (root, _, cb) -> {
             if (searchTerm == null || searchTerm.trim().isEmpty()) {
                 return cb.conjunction(); // Always true
             }
@@ -41,7 +41,7 @@ public class ShortenedUrlSpecifications {
     public static Specification<ShortenedUrl> createdBetween(
             LocalDateTime startDate,
             LocalDateTime endDate) {
-        return (root, query, cb) -> {
+        return (root, _, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (startDate != null) {
@@ -61,7 +61,7 @@ public class ShortenedUrlSpecifications {
      * Filter by click count range
      */
     public static Specification<ShortenedUrl> clicksBetween(Long minClicks, Long maxClicks) {
-        return (root, query, cb) -> {
+        return (root, _, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (minClicks != null) {
@@ -81,7 +81,7 @@ public class ShortenedUrlSpecifications {
      * Filter by expiration status
      */
     public static Specification<ShortenedUrl> isExpired(Boolean expired) {
-        return (root, query, cb) -> {
+        return (root, _, cb) -> {
             if (expired == null) {
                 return cb.conjunction(); // No filter
             }
@@ -108,7 +108,7 @@ public class ShortenedUrlSpecifications {
      * Only expired links
      */
     public static Specification<ShortenedUrl> expiredLinks() {
-        return (root, query, cb) -> cb.and(
+        return (root, _, cb) -> cb.and(
                 cb.isNotNull(root.get("expiresAt")),
                 cb.lessThan(root.get("expiresAt"), LocalDateTime.now())
         );
@@ -118,7 +118,7 @@ public class ShortenedUrlSpecifications {
      * Only active links (not expired)
      */
     public static Specification<ShortenedUrl> activeLinks() {
-        return (root, query, cb) -> {
+        return (root, _, cb) -> {
             LocalDateTime now = LocalDateTime.now();
             return cb.or(
                     cb.isNull(root.get("expiresAt")),

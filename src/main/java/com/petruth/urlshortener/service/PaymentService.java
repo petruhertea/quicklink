@@ -36,7 +36,7 @@ public class PaymentService {
                 .build();
 
         Session session = Session.create(params);
-        System.out.println("SUCCESS URL = [" + successUrl + "]");
+        IO.println("SUCCESS URL = [" + successUrl + "]");
         return session.getUrl();
     }
 }
