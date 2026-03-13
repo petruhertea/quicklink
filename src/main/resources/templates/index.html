@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html
-  xmlns:th="http://www.thymeleaf.org"
-  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
 >
-  <head>
+<head>
     <link rel="stylesheet" href="/css/ads.css">
     <link rel="stylesheet" href="/css/dark-mode.css">
     <link rel="icon" type="image/x-icon" href="/assets/quicklink-logo.ico">
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>QuickLink - URL Shortener</title>
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
     />
     <style>
         body {
@@ -21,29 +21,33 @@
             display: flex;
             flex-direction: column;
         }
+
         .hero-section {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 2rem;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
         }
+
         .card {
-          background: var(--ql-bg-secondary);
-          color: var(--ql-text-primary);
-          border-radius: 15px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-          border: none;
+            background: var(--ql-bg-secondary);
+            color: var(--ql-text-primary);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            border: none;
         }
+
         .btn-primary {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border: none;
-          padding: 12px 30px;
-          font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
         }
+
         .btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         .result-box {
@@ -53,292 +57,295 @@
             margin-top: 20px;
             display: none;
         }
+
         .copy-btn {
-          cursor: pointer;
+            cursor: pointer;
         }
+
         .navbar {
-          background: rgba(255, 255, 255, 0.95) !important;
-          backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
         }
+
         .feature-icon {
-          font-size: 2.5rem;
-          margin-bottom: 1rem;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
         }
     </style>
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container">
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
         <a class="navbar-brand fw-bold" href="/">
           <span style="color: #667eea">Quick</span
           ><span style="color: #764ba2">Link</span>
         </a>
         <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
         >
-          <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-              <div class="ms-auto d-flex align-items-center gap-2">
-                  <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
-                      <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                          <path d="M12 17q-2.075 0-3.537-1.463T7 12q0-2.075 1.463-3.537T12 7q2.075 0 3.538 1.463T17 12q0 2.075-1.463 3.538T12 17Zm0-2q1.25 0 2.125-.875T15 12q0-1.25-.875-2.125T12 9q-1.25 0-2.125.875T9 12q0 1.25.875 2.125T12 15Zm0-3Zm0 9q-.425 0-.712-.288T11 20v-1.5q0-.425.288-.712T12 17.5q.425 0 .713.288T13 18.5V20q0 .425-.288.713T12 21Zm0-17q-.425 0-.712-.288T11 3V1.5q0-.425.288-.712T12 .5q.425 0 .713.288T13 1.5V3q0 .425-.288.713T12 4Zm8 8q-.425 0-.712-.288T19 11q0-.425.288-.712T20 10h1.5q.425 0 .713.288T22.5 11q0 .425-.288.713T21.5 12H20Zm-17 0q-.425 0-.712-.288T2 11q0-.425.288-.712T3 10h1.5q.425 0 .713.288T5.5 11q0 .425-.288.713T4.5 12H3Zm14.95 7.05q-.3-.3-.3-.712t.3-.713l1.05-1.05q.3-.3.713-.3t.712.3q.3.3.3.713t-.3.712l-1.05 1.05q-.3.3-.712.3t-.713-.3Zm-12.9-12.9q-.3-.3-.3-.712t.3-.713l1.05-1.05q.3-.3.713-.3t.712.3q.3.3.3.713t-.3.712L6.475 5.35q-.3.3-.712.3T5.05 5.35Zm12.9 0l-1.05-1.05q-.3-.3-.3-.713t.3-.712q.3-.3.713-.3t.712.3l1.05 1.05q.3.3.3.713t-.3.712q-.3.3-.712.3T17.95 5.35Zm-12.9 12.9l-1.05-1.05q-.3-.3-.3-.712t.3-.713q.3-.3.713-.3t.712.3l1.05 1.05q.3.3.3.713t-.3.712q-.3.3-.712.3T5.05 18.25Z"/>
-                      </svg>
-                      <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                          <path d="M12 21q-3.75 0-6.375-2.625T3 12q0-3.75 2.625-6.375T12 3q.35 0 .688.025t.662.075q-1.025.725-1.638 1.888T11.1 7.5q0 2.25 1.575 3.825T16.5 12.9q1.375 0 2.525-.613T20.9 10.65q.05.325.075.663T21 12q0 3.75-2.625 6.375T12 21Zm0-2q2.2 0 3.95-1.213t2.55-3.162q-.5.125-1 .2t-1 .075q-3.075 0-5.238-2.163T9.1 7.5q0-.5.075-1t.2-1q-1.95.8-3.163 2.55T5 12q0 2.9 2.05 4.95T12 19Zm-.25-6.75Z"/>
-                      </svg>
-                  </button>
-              </div>
-            <li class="nav-item">
-              <a class="nav-link" href="#features">Features</a>
-            </li>
-            <li class="nav-item" sec:authorize="isAuthenticated()">
-              <a class="nav-link" href="/dashboard">Dashboard</a>
-            </li>
-            <li class="nav-item" sec:authorize="isAuthenticated()">
-              <a class="nav-link" href="/subscription">Subscription</a>
-            </li>
-              <li class="nav-item" sec:authorize="isAuthenticated()">
-                  <a class="nav-link" href="/bulk-shorten">Shorten Multiple</a>
-              </li>
-            <li class="nav-item" sec:authorize="!isAuthenticated()">
-              <a class="nav-link btn btn-outline-primary px-3" href="/login"
-                >Sign In</a
-              >
-            </li>
-            <li class="nav-item" sec:authorize="isAuthenticated()">
-              <form
-                th:action="@{/logout}"
-                method="post"
-                style="display: inline"
-              >
-                <button type="submit" class="nav-link btn btn-link">
-                  Logout
-                </button>
-              </form>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Show the ad banner (hidden automatically for premium users) -->
-    <div th:replace="~{fragment/banner}"></div>
-
-    <!-- Hero Section -->
-    <div class="hero-section">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-8">
-            <div class="card p-5">
-              <div class="text-center mb-4">
-                <h1 class="display-4 fw-bold mb-3">Shorten Your URLs</h1>
-                <p class="lead text-muted">
-                  Fast, free, and easy to use URL shortener
-                </p>
-              </div>
-
-              <!-- URL Shortening Form -->
-              <form id="shortenForm">
-                <div class="input-group input-group-lg mb-3">
-                  <input
-                    type="url"
-                    class="form-control"
-                    id="urlInput"
-                    placeholder="Enter your long URL here..."
-                    required
-                  />
-                  <button class="btn btn-primary" type="submit">Shorten</button>
+            <ul class="navbar-nav ms-auto">
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 17q-2.075 0-3.537-1.463T7 12q0-2.075 1.463-3.537T12 7q2.075 0 3.538 1.463T17 12q0 2.075-1.463 3.538T12 17Zm0-2q1.25 0 2.125-.875T15 12q0-1.25-.875-2.125T12 9q-1.25 0-2.125.875T9 12q0 1.25.875 2.125T12 15Zm0-3Zm0 9q-.425 0-.712-.288T11 20v-1.5q0-.425.288-.712T12 17.5q.425 0 .713.288T13 18.5V20q0 .425-.288.713T12 21Zm0-17q-.425 0-.712-.288T11 3V1.5q0-.425.288-.712T12 .5q.425 0 .713.288T13 1.5V3q0 .425-.288.713T12 4Zm8 8q-.425 0-.712-.288T19 11q0-.425.288-.712T20 10h1.5q.425 0 .713.288T22.5 11q0 .425-.288.713T21.5 12H20Zm-17 0q-.425 0-.712-.288T2 11q0-.425.288-.712T3 10h1.5q.425 0 .713.288T5.5 11q0 .425-.288.713T4.5 12H3Zm14.95 7.05q-.3-.3-.3-.712t.3-.713l1.05-1.05q.3-.3.713-.3t.712.3q.3.3.3.713t-.3.712l-1.05 1.05q-.3.3-.712.3t-.713-.3Zm-12.9-12.9q-.3-.3-.3-.712t.3-.713l1.05-1.05q.3-.3.713-.3t.712.3q.3.3.3.713t-.3.712L6.475 5.35q-.3.3-.712.3T5.05 5.35Zm12.9 0l-1.05-1.05q-.3-.3-.3-.713t.3-.712q.3-.3.713-.3t.712.3l1.05 1.05q.3.3.3.713t-.3.712q-.3.3-.712.3T17.95 5.35Zm-12.9 12.9l-1.05-1.05q-.3-.3-.3-.712t.3-.713q.3-.3.713-.3t.712.3l1.05 1.05q.3.3.3.713t-.3.712q-.3.3-.712.3T5.05 18.25Z"/>
+                        </svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 21q-3.75 0-6.375-2.625T3 12q0-3.75 2.625-6.375T12 3q.35 0 .688.025t.662.075q-1.025.725-1.638 1.888T11.1 7.5q0 2.25 1.575 3.825T16.5 12.9q1.375 0 2.525-.613T20.9 10.65q.05.325.075.663T21 12q0 3.75-2.625 6.375T12 21Zm0-2q2.2 0 3.95-1.213t2.55-3.162q-.5.125-1 .2t-1 .075q-3.075 0-5.238-2.163T9.1 7.5q0-.5.075-1t.2-1q-1.95.8-3.163 2.55T5 12q0 2.9 2.05 4.95T12 19Zm-.25-6.75Z"/>
+                        </svg>
+                    </button>
                 </div>
-
-                <!-- Expiration Options -->
-                <div class="mb-3">
-                  <label class="form-label">Link Expiration (Optional)</label>
-                  <select class="form-select" id="expirationDays">
-                    <option value="">Never expires</option>
-                    <option value="1">1 day</option>
-                    <option value="7">7 days</option>
-                    <option value="30">30 days</option>
-                    <option value="90">90 days</option>
-                    <option value="365">1 year</option>
-                  </select>
-                  <small class="text-muted"
-                    >Choose when this link should stop working</small
-                  >
-                </div>
-                <div
-                  sec:authorize="isAuthenticated()"
-                  th:if="${user != null and user.premium}"
-                  class="mb-3"
-                >
-                  <label class="form-label">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      class="bi bi-star-fill"
-                      viewBox="0 0 16 16"
+                <li class="nav-item">
+                    <a class="nav-link" href="#features">Features</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" href="/dashboard">Dashboard</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" href="/subscription">Subscription</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" href="/bulk-shorten">Shorten Multiple</a>
+                </li>
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="nav-link btn btn-outline-primary px-3" href="/login"
+                    >Sign In</a
                     >
-                      <path
-                        d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"
-                      />
-                    </svg>
-                    Custom Short Code (Premium)
-                  </label>
-                  <div class="input-group">
-                    <span class="input-group-text">https://quicklink-uln2.onrender.com/api/</span>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="customCode"
-                      placeholder="my-link"
-                      pattern="[a-zA-Z0-9_-]+"
-                      maxlength="20"
-                      minlength="3"
-                    />
-                  </div>
-                  <small class="text-muted"
-                    >Optional: Create a memorable custom code</small
-                  >
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <form
+                            th:action="@{/logout}"
+                            method="post"
+                            style="display: inline"
+                    >
+                        <button type="submit" class="nav-link btn btn-link">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Show the ad banner (hidden automatically for premium users) -->
+<div th:replace="~{fragment/banner}"></div>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card p-5">
+                    <div class="text-center mb-4">
+                        <h1 class="display-4 fw-bold mb-3">Shorten Your URLs</h1>
+                        <p class="lead text-muted">
+                            Fast, free, and easy to use URL shortener
+                        </p>
+                    </div>
+
+                    <!-- URL Shortening Form -->
+                    <form id="shortenForm">
+                        <div class="input-group input-group-lg mb-3">
+                            <input
+                                    type="url"
+                                    class="form-control"
+                                    id="urlInput"
+                                    placeholder="Enter your long URL here..."
+                                    required
+                            />
+                            <button class="btn btn-primary" type="submit">Shorten</button>
+                        </div>
+
+                        <!-- Expiration Options -->
+                        <div class="mb-3">
+                            <label class="form-label">Link Expiration (Optional)</label>
+                            <select class="form-select" id="expirationDays">
+                                <option value="">Never expires</option>
+                                <option value="1">1 day</option>
+                                <option value="7">7 days</option>
+                                <option value="30">30 days</option>
+                                <option value="90">90 days</option>
+                                <option value="365">1 year</option>
+                            </select>
+                            <small class="text-muted"
+                            >Choose when this link should stop working</small
+                            >
+                        </div>
+                        <div
+                                sec:authorize="isAuthenticated()"
+                                th:if="${user != null and user.premium}"
+                                class="mb-3"
+                        >
+                            <label class="form-label">
+                                <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        fill="currentColor"
+                                        class="bi bi-star-fill"
+                                        viewBox="0 0 16 16"
+                                >
+                                    <path
+                                            d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"
+                                    />
+                                </svg>
+                                Custom Short Code (Premium)
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">https://quicklink-uln2.onrender.com/api/</span>
+                                <input
+                                        type="text"
+                                        class="form-control"
+                                        id="customCode"
+                                        placeholder="my-link"
+                                        pattern="[a-zA-Z0-9_-]+"
+                                        maxlength="20"
+                                        minlength="3"
+                                />
+                            </div>
+                            <small class="text-muted"
+                            >Optional: Create a memorable custom code</small
+                            >
+                        </div>
+                    </form>
+
+                    <!-- Error Message -->
+                    <div
+                            id="errorMessage"
+                            class="alert alert-danger"
+                            style="display: none"
+                    ></div>
+
+                    <!-- Result Box -->
+                    <div id="resultBox" class="result-box">
+                        <label class="form-label fw-bold">Your shortened URL:</label>
+                        <div class="input-group">
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    id="shortUrl"
+                                    readonly
+                            />
+                            <button
+                                    class="btn btn-outline-secondary copy-btn"
+                                    type="button"
+                                    id="copyBtn"
+                            >
+                                📋 Copy
+                            </button>
+                        </div>
+                        <small class="text-muted mt-2 d-block">
+                            Click to copy your shortened link
+                        </small>
+                    </div>
+
+                    <div class="text-center mt-4" sec:authorize="!isAuthenticated()">
+                        <p class="text-muted">
+                            <a
+                                    href="/login"
+                                    class="text-decoration-none"
+                            >Sign in</a
+                            >
+                            to track your links and view analytics
+                        </p>
+                    </div>
                 </div>
-              </form>
-
-              <!-- Error Message -->
-              <div
-                id="errorMessage"
-                class="alert alert-danger"
-                style="display: none"
-              ></div>
-
-              <!-- Result Box -->
-              <div id="resultBox" class="result-box">
-                <label class="form-label fw-bold">Your shortened URL:</label>
-                <div class="input-group">
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="shortUrl"
-                    readonly
-                  />
-                  <button
-                    class="btn btn-outline-secondary copy-btn"
-                    type="button"
-                    id="copyBtn"
-                  >
-                    📋 Copy
-                  </button>
-                </div>
-                <small class="text-muted mt-2 d-block">
-                  Click to copy your shortened link
-                </small>
-              </div>
-
-              <div class="text-center mt-4" sec:authorize="!isAuthenticated()">
-                <p class="text-muted">
-                  <a
-                    href="/login"
-                    class="text-decoration-none"
-                    >Sign in</a
-                  >
-                  to track your links and view analytics
-                </p>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
+</div>
 
-    <!-- Features Section -->
-    <div class="container py-5" id="features">
-      <div class="row text-center text-white">
+<!-- Features Section -->
+<div class="container py-5" id="features">
+    <div class="row text-center text-white">
         <div class="col-md-4 mb-4">
-          <div class="feature-icon">⚡</div>
-          <h4>Lightning Fast</h4>
-          <p>Shorten URLs in milliseconds with our optimized infrastructure</p>
+            <div class="feature-icon">⚡</div>
+            <h4>Lightning Fast</h4>
+            <p>Shorten URLs in milliseconds with our optimized infrastructure</p>
         </div>
         <div class="col-md-4 mb-4">
-          <div class="feature-icon">📊</div>
-          <h4>Track Analytics</h4>
-          <p>Monitor clicks and performance of your shortened links</p>
+            <div class="feature-icon">📊</div>
+            <h4>Track Analytics</h4>
+            <p>Monitor clicks and performance of your shortened links</p>
         </div>
         <div class="col-md-4 mb-4">
-          <div class="feature-icon">🔒</div>
-          <h4>Secure & Reliable</h4>
-          <p>Your links are safe with enterprise-grade security</p>
+            <div class="feature-icon">🔒</div>
+            <h4>Secure & Reliable</h4>
+            <p>Your links are safe with enterprise-grade security</p>
         </div>
-      </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      document
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document
         .getElementById("shortenForm")
         .addEventListener("submit", async (e) => {
-          e.preventDefault();
+            e.preventDefault();
 
-          const urlInput = document.getElementById("urlInput");
-          const expirationDays = document.getElementById("expirationDays");
-          const customCode = document.getElementById("customCode");
-          const errorMessage = document.getElementById("errorMessage");
-          const resultBox = document.getElementById("resultBox");
-          const shortUrlInput = document.getElementById("shortUrl");
+            const urlInput = document.getElementById("urlInput");
+            const expirationDays = document.getElementById("expirationDays");
+            const customCode = document.getElementById("customCode");
+            const errorMessage = document.getElementById("errorMessage");
+            const resultBox = document.getElementById("resultBox");
+            const shortUrlInput = document.getElementById("shortUrl");
 
-          // Hide previous results/errors
-          errorMessage.style.display = "none";
-          resultBox.style.display = "none";
+            // Hide previous results/errors
+            errorMessage.style.display = "none";
+            resultBox.style.display = "none";
 
-          const requestBody = {
-            url: urlInput.value,
-          };
+            const requestBody = {
+                url: urlInput.value,
+            };
 
-          // Add expiration if selected
-          if (expirationDays.value) {
-            requestBody.expirationDays = parseInt(expirationDays.value);
-          }
-
-          // Add custom code if provided
-          if (customCode && customCode.value.trim()) {
-            requestBody.customCode = customCode.value.trim();
-          }
-
-          try {
-            const response = await fetch("/api/shorten", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(requestBody),
-            });
-
-            if (response.ok) {
-              const data = await response.json();
-              shortUrlInput.value = data.shortUrl;
-              resultBox.style.display = "block";
-
-              // Clear custom code input if it exists
-              if (customCode) {
-                customCode.value = "";
-              }
-            } else {
-              const error = await response.json();
-              errorMessage.textContent =
-                error.error || error.url || "Failed to shorten URL";
-              errorMessage.style.display = "block";
+            // Add expiration if selected
+            if (expirationDays.value) {
+                requestBody.expirationDays = parseInt(expirationDays.value);
             }
-          } catch (error) {
-            errorMessage.textContent = "Network error. Please try again.";
-            errorMessage.style.display = "block";
-          }
+
+            // Add custom code if provided
+            if (customCode && customCode.value.trim()) {
+                requestBody.customCode = customCode.value.trim();
+            }
+
+            try {
+                const response = await fetch("/api/shorten", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    shortUrlInput.value = data.shortUrl;
+                    resultBox.style.display = "block";
+
+                    // Clear custom code input if it exists
+                    if (customCode) {
+                        customCode.value = "";
+                    }
+                } else {
+                    const error = await response.json();
+                    errorMessage.textContent =
+                        error.error || error.url || "Failed to shorten URL";
+                    errorMessage.style.display = "block";
+                }
+            } catch (error) {
+                errorMessage.textContent = "Network error. Please try again.";
+                errorMessage.style.display = "block";
+            }
         });
 
-      document.getElementById("copyBtn").addEventListener("click", () => {
+    document.getElementById("copyBtn").addEventListener("click", () => {
         const shortUrlInput = document.getElementById("shortUrl");
         shortUrlInput.select();
         document.execCommand("copy");
@@ -347,11 +354,11 @@
         const originalText = copyBtn.textContent;
         copyBtn.textContent = "✓ Copied!";
         setTimeout(() => {
-          copyBtn.textContent = originalText;
+            copyBtn.textContent = originalText;
         }, 2000);
-      });
-    </script>
-    <script src="/js/dark-mode.js"></script>
-    <div th:replace="fragment/footer :: footer"></div>
-  </body>
+    });
+</script>
+<script src="/js/dark-mode.js"></script>
+<div th:replace="fragment/footer :: footer"></div>
+</body>
 </html>

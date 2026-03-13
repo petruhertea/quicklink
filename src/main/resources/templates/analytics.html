@@ -18,25 +18,30 @@
             border-radius: 12px;
             margin-bottom: 1rem;
         }
+
         .stat-box h3 {
             font-size: 2.5rem;
             font-weight: bold;
             margin: 0;
         }
+
         .stat-box p {
             margin: 0;
             opacity: 0.9;
         }
+
         .analytics-card {
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
         }
+
         .link-info {
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 1.5rem;
         }
+
         .premium-badge {
             background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
             color: #333;
@@ -45,10 +50,12 @@
             font-size: 0.75rem;
             font-weight: 700;
         }
+
         .chart-container {
             position: relative;
             height: 300px;
         }
+
         .table-responsive {
             border-radius: 8px;
             overflow: hidden;
@@ -263,9 +270,9 @@
     let browsersChart = null;
 
     document.querySelectorAll('.btn-group button').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const days = parseInt(btn.dataset.days);
-        loadAnalytics(days, btn);
+        btn.addEventListener('click', () => {
+            const days = parseInt(btn.dataset.days);
+            loadAnalytics(days, btn);
         });
     });
 
@@ -295,7 +302,6 @@
             console.error('Error loading analytics:', error);
         }
     }
-
 
 
     function updateClicksChart(data) {
@@ -422,8 +428,8 @@
             <tr>
                 <td>
                     ${d.label === 'Direct'
-                        ? '<span class="badge bg-secondary">Direct / Unknown</span>'
-                        : `<a href="https://${d.label}" target="_blank">${d.label}</a>`}
+            ? '<span class="badge bg-secondary">Direct / Unknown</span>'
+            : `<a href="https://${d.label}" target="_blank">${d.label}</a>`}
                 </td>
                 <td class="text-end"><strong>${d.count}</strong></td>
                 <td class="text-end">${((d.count / total) * 100).toFixed(1)}%</td>

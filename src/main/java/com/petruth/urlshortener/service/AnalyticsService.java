@@ -8,8 +8,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,7 +90,7 @@ public class AnalyticsService {
             return "Direct";
         }
         try {
-            java.net.URL url = new java.net.URL(referer);
+            URL url = URI.create(referer).toURL();
             String host = url.getHost();
             // Strip www. prefix
             return host.startsWith("www.") ? host.substring(4) : host;

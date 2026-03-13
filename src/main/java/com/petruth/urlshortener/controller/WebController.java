@@ -2,7 +2,6 @@ package com.petruth.urlshortener.controller;
 
 import com.petruth.urlshortener.entity.ShortenedUrl;
 import com.petruth.urlshortener.entity.User;
-import com.petruth.urlshortener.entity.UserOAuthProvider;
 import com.petruth.urlshortener.repository.ClickAnalyticsRepository;
 import com.petruth.urlshortener.service.ShortenedUrlServiceImpl;
 import com.petruth.urlshortener.service.UserServiceImpl;
@@ -13,11 +12,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 

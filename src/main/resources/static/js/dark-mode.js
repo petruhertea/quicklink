@@ -15,160 +15,160 @@
    2. Add the toggle button to your navbar (see HTML snippet below)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-(function() {
-  'use strict';
+(function () {
+    'use strict';
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // Constants
-  // ───────────────────────────────────────────────────────────────────────────
-  const STORAGE_KEY = 'quicklink-theme';
-  const THEME_LIGHT = 'light';
-  const THEME_DARK = 'dark';
+    // ───────────────────────────────────────────────────────────────────────────
+    // Constants
+    // ───────────────────────────────────────────────────────────────────────────
+    const STORAGE_KEY = 'quicklink-theme';
+    const THEME_LIGHT = 'light';
+    const THEME_DARK = 'dark';
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // Core Theme Management
-  // ───────────────────────────────────────────────────────────────────────────
+    // ───────────────────────────────────────────────────────────────────────────
+    // Core Theme Management
+    // ───────────────────────────────────────────────────────────────────────────
 
-  /**
-   * Get the user's preferred theme
-   * Priority: localStorage > system preference > default (light)
-   */
-  function getPreferredTheme() {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      return stored;
+    /**
+     * Get the user's preferred theme
+     * Priority: localStorage > system preference > default (light)
+     */
+    function getPreferredTheme() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            return stored;
+        }
+
+        // Check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return THEME_DARK;
+        }
+
+        return THEME_LIGHT;
     }
 
-    // Check system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return THEME_DARK;
+    /**
+     * Apply theme to the document
+     */
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem(STORAGE_KEY, theme);
+
+        // Update Chart.js charts if they exist
+        updateChartColors(theme);
     }
 
-    return THEME_LIGHT;
-  }
+    /**
+     * Toggle between light and dark themes
+     */
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme') || THEME_LIGHT;
+        const newTheme = current === THEME_LIGHT ? THEME_DARK : THEME_LIGHT;
+        setTheme(newTheme);
+    }
 
-  /**
-   * Apply theme to the document
-   */
-  function setTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem(STORAGE_KEY, theme);
+    // ───────────────────────────────────────────────────────────────────────────
+    // Chart.js Dark Mode Support
+    // ───────────────────────────────────────────────────────────────────────────
 
-    // Update Chart.js charts if they exist
-    updateChartColors(theme);
-  }
+    /**
+     * Update Chart.js chart colors when theme changes
+     */
+    function updateChartColors(theme) {
+        if (typeof Chart === 'undefined' || !Chart.instances) return;
 
-  /**
-   * Toggle between light and dark themes
-   */
-  function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme') || THEME_LIGHT;
-    const newTheme = current === THEME_LIGHT ? THEME_DARK : THEME_LIGHT;
-    setTheme(newTheme);
-  }
+        const charts = Object.values(Chart.instances);
+        if (!charts.length) return;
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // Chart.js Dark Mode Support
-  // ───────────────────────────────────────────────────────────────────────────
+        const isDark = theme === 'dark';
+        const textColor = isDark ? '#e9ecef' : '#212529';
+        const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
 
-  /**
-   * Update Chart.js chart colors when theme changes
-   */
-  function updateChartColors(theme) {
-    if (typeof Chart === 'undefined' || !Chart.instances) return;
+        charts.forEach(chart => {
+            if (!chart.options?.scales) return;
 
-    const charts = Object.values(Chart.instances);
-    if (!charts.length) return;
+            Object.values(chart.options.scales).forEach(scale => {
+                scale.ticks && (scale.ticks.color = textColor);
+                scale.grid && (scale.grid.color = gridColor);
+            });
 
-    const isDark = theme === 'dark';
-    const textColor = isDark ? '#e9ecef' : '#212529';
-    const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+            chart.options?.plugins?.legend?.labels &&
+            (chart.options.plugins.legend.labels.color = textColor);
 
-    charts.forEach(chart => {
-      if (!chart.options?.scales) return;
-
-      Object.values(chart.options.scales).forEach(scale => {
-        scale.ticks && (scale.ticks.color = textColor);
-        scale.grid && (scale.grid.color = gridColor);
-      });
-
-      chart.options?.plugins?.legend?.labels &&
-        (chart.options.plugins.legend.labels.color = textColor);
-
-      chart.update();
-    });
-  }
+            chart.update();
+        });
+    }
 
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // System Preference Change Listener
-  // ───────────────────────────────────────────────────────────────────────────
+    // ───────────────────────────────────────────────────────────────────────────
+    // System Preference Change Listener
+    // ───────────────────────────────────────────────────────────────────────────
 
-  /**
-   * Listen for system theme changes (only if user hasn't manually set a preference)
-   */
-  function listenForSystemChanges() {
-    if (!window.matchMedia) return;
+    /**
+     * Listen for system theme changes (only if user hasn't manually set a preference)
+     */
+    function listenForSystemChanges() {
+        if (!window.matchMedia) return;
 
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      // Only auto-switch if user hasn't manually set a preference
-      if (!localStorage.getItem(STORAGE_KEY)) {
-        setTheme(e.matches ? THEME_DARK : THEME_LIGHT);
-      }
-    });
-  }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            // Only auto-switch if user hasn't manually set a preference
+            if (!localStorage.getItem(STORAGE_KEY)) {
+                setTheme(e.matches ? THEME_DARK : THEME_LIGHT);
+            }
+        });
+    }
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // Initialize on Page Load
-  // ───────────────────────────────────────────────────────────────────────────
+    // ───────────────────────────────────────────────────────────────────────────
+    // Initialize on Page Load
+    // ───────────────────────────────────────────────────────────────────────────
 
-  /**
-   * Initialize theme immediately to prevent FOUC
-   * This runs synchronously before DOMContentLoaded
-   */
-  function init() {
-    const theme = getPreferredTheme();
-    setTheme(theme);
-  }
+    /**
+     * Initialize theme immediately to prevent FOUC
+     * This runs synchronously before DOMContentLoaded
+     */
+    function init() {
+        const theme = getPreferredTheme();
+        setTheme(theme);
+    }
 
-  /**
-   * Set up event listeners and toggle button after DOM loads
-   */
-  function setupUI() {
-    // Listen for system preference changes
-    listenForSystemChanges();
+    /**
+     * Set up event listeners and toggle button after DOM loads
+     */
+    function setupUI() {
+        // Listen for system preference changes
+        listenForSystemChanges();
 
-    // Set up toggle buttons (multiple may exist across pages)
-    const toggleButtons = document.querySelectorAll('.theme-toggle');
-    toggleButtons.forEach(button => {
-      button.addEventListener('click', toggleTheme);
-    });
-  }
+        // Set up toggle buttons (multiple may exist across pages)
+        const toggleButtons = document.querySelectorAll('.theme-toggle');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', toggleTheme);
+        });
+    }
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // Run Initialization
-  // ───────────────────────────────────────────────────────────────────────────
+    // ───────────────────────────────────────────────────────────────────────────
+    // Run Initialization
+    // ───────────────────────────────────────────────────────────────────────────
 
-  // Apply theme immediately (prevents FOUC)
-  init();
+    // Apply theme immediately (prevents FOUC)
+    init();
 
-  // Set up UI after DOM loads
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupUI);
-  } else {
-    setupUI();
-  }
+    // Set up UI after DOM loads
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupUI);
+    } else {
+        setupUI();
+    }
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // Global API (optional - for manual control)
-  // ───────────────────────────────────────────────────────────────────────────
+    // ───────────────────────────────────────────────────────────────────────────
+    // Global API (optional - for manual control)
+    // ───────────────────────────────────────────────────────────────────────────
 
-  window.QuickLinkTheme = {
-    get: () => document.documentElement.getAttribute('data-theme'),
-    set: setTheme,
-    toggle: toggleTheme,
-    getPreferred: getPreferredTheme
-  };
+    window.QuickLinkTheme = {
+        get: () => document.documentElement.getAttribute('data-theme'),
+        set: setTheme,
+        toggle: toggleTheme,
+        getPreferred: getPreferredTheme
+    };
 
 })();
 

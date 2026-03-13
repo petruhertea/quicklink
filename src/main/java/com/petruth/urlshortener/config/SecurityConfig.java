@@ -1,6 +1,5 @@
 package com.petruth.urlshortener.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petruth.urlshortener.service.CustomOAuth2UserService;
 import com.petruth.urlshortener.service.CustomOidcUserService;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
-import org.springframework.core.annotation.Order;
 
 @Configuration
 @EnableWebSecurity

@@ -4,8 +4,8 @@
     <link rel="stylesheet" href="/css/ads.css">
     <link rel="icon" type="image/x-icon" href="assets/quicklink-logo.ico">
     <link href="/css/dark-mode.css" rel="stylesheet">
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Sign In - QuickLink</title>
     <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -20,122 +20,143 @@
             justify-content: center;
             padding: 2rem;
         }
+
         .login-card {
-          background: var(--ql-card-bg);
-          color: var(--ql-text-primary);
-          border-radius: 20px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-          padding: 3rem;
-          max-width: 450px;
-          width: 100%;
+            background: var(--ql-card-bg);
+            color: var(--ql-text-primary);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 3rem;
+            max-width: 450px;
+            width: 100%;
         }
+
         .logo {
-          text-align: center;
-          margin-bottom: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
         }
+
         .logo h1 {
-          font-size: 2.5rem;
-          font-weight: 800;
-          margin: 0;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
         }
+
         .logo p {
-          color: #6c757d;
-          margin-top: 0.5rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
         }
+
         .oauth-btn {
-          width: 100%;
-          padding: 14px 20px;
-          border-radius: 10px;
-          border: 2px solid var(--ql-border-color);
-          background: var(--ql-card-bg);
-          font-weight: 600;
-          font-size: 1rem;
-          transition: all 0.3s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
-          margin-bottom: 1rem;
-          text-decoration: none;
-          color: var(--ql-text-primary);
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 10px;
+            border: 2px solid var(--ql-border-color);
+            background: var(--ql-card-bg);
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+            text-decoration: none;
+            color: var(--ql-text-primary);
         }
+
         .oauth-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             color: var(--ql-text-primary);
         }
+
         .google-btn:hover {
-          border-color: #4285f4;
+            border-color: #4285f4;
         }
+
         .github-btn:hover {
-          border-color: #333;
+            border-color: #333;
         }
+
         .microsoft-btn:hover {
-          border-color: #00a4ef;
+            border-color: #00a4ef;
         }
+
         .divider {
-          text-align: center;
-          margin: 1.5rem 0;
-          position: relative;
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
         }
+
         .divider::before {
-          content: "";
-          position: absolute;
-          top: 50%;
-          left: 0;
-          right: 0;
-          height: 1px;
-          background: var(--ql-border-color);
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--ql-border-color);
         }
+
         .divider span {
-          padding: 0 1rem;
-          position: relative;
-          font-size: 0.875rem;
+            padding: 0 1rem;
+            position: relative;
+            font-size: 0.875rem;
         }
+
         .back-link {
-          text-align: center;
-          margin-top: 2rem;
+            text-align: center;
+            margin-top: 2rem;
         }
+
         .back-link a {
-          color: #667eea;
-          text-decoration: none;
-          font-weight: 600;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
         }
+
         .back-link a:hover {
-          text-decoration: underline;
+            text-decoration: underline;
         }
+
         .error-alert {
-          background: #fee;
-          border: 1px solid #fcc;
-          color: #c33;
-          padding: 1rem;
-          border-radius: 10px;
-          margin-bottom: 1.5rem;
-          font-size: 0.9rem;
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
         }
+
         .benefits {
-          border-radius: 10px;
-          padding: 1.5rem;
-          margin-top: 2rem;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
         }
+
         .benefits h6 {
-          font-weight: 700;
-          margin-bottom: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
         }
+
         .benefits ul {
-          list-style: none;
-          padding: 0;
-          margin: 0;
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
+
         .benefits li {
-          padding: 0.5rem 0;
-          font-size: 0.9rem;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
         }
+
         .benefits li::before {
-          content: "✓";
-          color: #667eea;
-          font-weight: bold;
-          margin-right: 0.5rem;
+            content: "✓";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 0.5rem;
         }
     </style>
 </head>
@@ -152,7 +173,7 @@
 
     <!-- Error message if login failed -->
     <div th:if="${param.error}" class="error-alert">
-        <strong>⚠️ Authentication failed</strong><br />
+        <strong>⚠️ Authentication failed</strong><br/>
         Unable to sign in. Please try again.
     </div>
 

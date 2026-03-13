@@ -2,7 +2,7 @@ package com.petruth.urlshortener.controller;
 
 import com.petruth.urlshortener.entity.ShortenedUrl;
 import com.petruth.urlshortener.entity.User;
-import com.petruth.urlshortener.repository.ShortenedUrlRepository;
+import com.petruth.urlshortener.entity.UserOAuthProvider;
 import com.petruth.urlshortener.service.ExtensionTokenService;
 import com.petruth.urlshortener.service.ShortenedUrlService;
 import com.petruth.urlshortener.service.UserServiceImpl;
@@ -122,7 +122,7 @@ public class NotificationController {
         }
 
         return userService.findByOAuth(provider, oauthId)
-                .map(p -> p.getUser())
+                .map(UserOAuthProvider::getUser)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

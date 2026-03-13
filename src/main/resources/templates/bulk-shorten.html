@@ -10,14 +10,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .navbar {
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .bulk-card {
             border-radius: 12px;
             padding: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
         }
+
         .drop-zone {
             border: 2px dashed var(--ql-brand-primary);
             border-radius: 12px;
@@ -27,24 +29,30 @@
             transition: all 0.3s;
             /* background handled by dark-mode.css */
         }
+
         .drop-zone:hover {
             /* background handled by dark-mode.css */
             border-color: var(--ql-brand-secondary);
         }
+
         .drop-zone.active {
             /* background handled by dark-mode.css */
             border-color: var(--ql-brand-primary);
         }
+
         .results-table {
             max-height: 500px;
             overflow-y: auto;
         }
+
         .success-row {
             background: #d4edda;
         }
+
         .error-row {
             background: #f8d7da;
         }
+
         .premium-badge {
             background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
             color: #333;
@@ -160,14 +168,17 @@ https://example.com/page3"></textarea>
                         <div class="drop-zone" id="dropZone">
                             <input type="file" id="csvFile" accept=".csv" style="display: none;">
                             <div class="mb-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-file-earmark-arrow-up" viewBox="0 0 16 16">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                                     class="bi bi-file-earmark-arrow-up" viewBox="0 0 16 16">
                                     <path d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707z"/>
                                     <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
                                 </svg>
                             </div>
                             <h5>Drop CSV file here or click to upload</h5>
-                            <p class="text-muted">CSV should have columns: url, customCode (optional), expirationDays (optional)</p>
-                            <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('csvFile').click()">
+                            <p class="text-muted">CSV should have columns: url, customCode (optional), expirationDays
+                                (optional)</p>
+                            <button type="button" class="btn btn-outline-primary"
+                                    onclick="document.getElementById('csvFile').click()">
                                 Choose File
                             </button>
                         </div>
@@ -214,7 +225,8 @@ https://example.com/page3"></textarea>
                     <h5 class="mb-0">Results</h5>
                     <div>
                         <button class="btn btn-sm btn-success" id="downloadCsvBtn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-download" viewBox="0 0 16 16">
                                 <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
                                 <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
                             </svg>
@@ -347,7 +359,7 @@ https://example.com/page3"></textarea>
 
         Papa.parse(file, {
             header: true,
-            complete: function(results) {
+            complete: function (results) {
                 csvData = results.data.filter(row => row.url && row.url.trim());
 
                 if (csvData.length === 0) {
@@ -409,7 +421,7 @@ https://example.com/page3"></textarea>
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ urls: urls })
+                body: JSON.stringify({urls: urls})
             });
 
             progressBar.style.width = '100%';
@@ -441,14 +453,14 @@ https://example.com/page3"></textarea>
             <tr class="${result.success ? 'success-row' : 'error-row'}">
                 <td>
                     ${result.success ?
-                        '<span class="badge bg-success">✓ Success</span>' :
-                        '<span class="badge bg-danger">✗ Failed</span>'}
+            '<span class="badge bg-success">✓ Success</span>' :
+            '<span class="badge bg-danger">✗ Failed</span>'}
                 </td>
                 <td class="text-truncate" style="max-width: 300px;">${result.originalUrl}</td>
                 <td>
                     ${result.shortUrl ?
-                        `<a href="${result.shortUrl}" target="_blank">${result.shortUrl}</a>` :
-                        '-'}
+            `<a href="${result.shortUrl}" target="_blank">${result.shortUrl}</a>` :
+            '-'}
                 </td>
                 <td>${result.code || '-'}</td>
                 <td>${result.error || '-'}</td>
@@ -474,7 +486,7 @@ https://example.com/page3"></textarea>
             ])
         ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
 
-        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const blob = new Blob([csvContent], {type: 'text/csv'});
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
