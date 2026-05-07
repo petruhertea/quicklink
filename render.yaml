@@ -55,6 +55,18 @@ services:
       - key: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
         value: "10"
 
+      - key: SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE
+        value: "3"
+
+      - key: SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT
+        value: "3000"
+
+      - key: SPRING_DATASOURCE_HIKARI_KEEPALIVE_TIME
+        value: "60000"
+
+      - key: SPRING_DATASOURCE_HIKARI_MAX_LIFETIME
+        value: "540000"
+
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
         value: validate
 
