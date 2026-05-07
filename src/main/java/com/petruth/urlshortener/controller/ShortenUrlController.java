@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Validated
 @RestController
@@ -182,7 +183,7 @@ public class ShortenUrlController {
         }
 
         User user = userService.findByOAuth(provider, oauthId)
-                .map(oauthProvider -> oauthProvider.getUser())
+                .map(UserOAuthProvider::getUser)
                 .orElse(null);
 
         if (user == null) {
@@ -325,7 +326,7 @@ public class ShortenUrlController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        ShortenedUrl url = shortenedUrlService.findByCode(code);
+        ShortenedUrl url = shortenedUrlService.findByCodeWithUser(code).orElseThrow();
         if (url == null) {
             return ResponseEntity.notFound().build();
         }
@@ -366,7 +367,7 @@ public class ShortenUrlController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        ShortenedUrl url = shortenedUrlService.findByCode(code);
+        ShortenedUrl url = shortenedUrlService.findByCodeWithUser(code).orElseThrow();
         if (url == null) {
             return ResponseEntity.notFound().build();
         }

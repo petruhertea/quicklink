@@ -185,6 +185,23 @@ public class ShortenedUrlServiceImpl implements ShortenedUrlService {
 
     @Override
     public long countActiveLinks(User user) {
-        return shortenedUrlRepository.countByUserAndExpiresAtAfter(user, LocalDateTime.now());
+        return shortenedUrlRepository.countActiveByUser(user, LocalDateTime.now());
     }
+
+    @Override
+    public long sumClicksByUser(User user) {
+        return shortenedUrlRepository.sumClickCountByUser(user);
+    }
+
+    @Override
+    public long countClicksTodayByUser(User user, LocalDateTime startOfDay) {
+        return shortenedUrlRepository.countAccessedTodayByUser(user, startOfDay);
+    }
+
+    @Override
+    public Optional<ShortenedUrl> findByCodeWithUser(String code) {
+        return shortenedUrlRepository.findByCodeWithUser(code);
+    }
+
+
 }

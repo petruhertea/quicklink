@@ -6,6 +6,7 @@ import com.petruth.urlshortener.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,4 +33,7 @@ public interface ShortenedUrlService {
     long countUserLinks(User user);
     long countExpiredLinks(User user);
     long countActiveLinks(User user);
+    long sumClicksByUser(User user);
+    long countClicksTodayByUser(User user, LocalDateTime startOfDay);
+    Optional<ShortenedUrl> findByCodeWithUser(String code);
 }

@@ -116,9 +116,9 @@ public class WebController {
                                     existingUser.getId(), existingUser.getEmail());
                             log.error("OAuth providers for this user: {}",
                                     existingUser.getOauthProviders().size());
-                            existingUser.getOauthProviders().forEach(p ->
-                                    log.error("  - Provider: {}, OAuth ID: {}", p.getOauthProvider(), p.getOauthId())
-                            );
+                            log.error("User exists by email but OAuth provider not found. " +
+                                            "Provider={}, OAuthId={}, UserEmail={}",
+                                    provider, finalOauthId, existingUser.getEmail());
                         } else {
                             log.error("No user found with email: {}", (Object) principal.getAttribute("email"));
                         }
@@ -201,19 +201,11 @@ public class WebController {
         stats.put("expiredLinks", shortenedUrlService.countExpiredLinks(user));
 
         // Calculate total clicks from ALL user's links (not just current page)
-        List<ShortenedUrl> allUrls = shortenedUrlService.findByUser(user);
-        long totalClicks = allUrls.stream()
-                .mapToLong(url -> url.getClickCount() != null ? url.getClickCount() : 0)
-                .sum();
-        stats.put("totalClicks", totalClicks);
+        stats.put("totalClicks", shortenedUrlService.sumClicksByUser(user));
 
         // Count clicks today from ALL user's links
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-        long clicksToday = allUrls.stream()
-                .filter(url -> url.getLastAccessed() != null &&
-                        url.getLastAccessed().isAfter(startOfDay))
-                .count();
-        stats.put("clicksToday", clicksToday);
+        stats.put("clicksToday",  shortenedUrlService.countClicksTodayByUser(user, startOfDay));
 
         model.addAttribute("user", user);
         model.addAttribute("urlPage", urlPage);

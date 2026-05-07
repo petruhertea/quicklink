@@ -77,4 +77,19 @@ public interface ShortenedUrlRepository extends JpaRepository<ShortenedUrl, Long
 
     // Also add this for the extension token endpoint:
     Optional<ShortenedUrl> findByIdAndUserId(Long id, Long userId);
+
+    @Query("SELECT COALESCE(SUM(s.clickCount), 0) FROM ShortenedUrl s WHERE s.user = :user")
+    long sumClickCountByUser(@Param("user") User user);
+
+    @Query("SELECT COUNT(s) FROM ShortenedUrl s WHERE s.user = :user " +
+            "AND s.lastAccessed >= :startOfDay")
+    long countAccessedTodayByUser(@Param("user") User user,
+                                  @Param("startOfDay") LocalDateTime startOfDay);
+
+    @Query("SELECT s FROM ShortenedUrl s JOIN FETCH s.user WHERE s.code = :code")
+    Optional<ShortenedUrl> findByCodeWithUser(@Param("code") String code);
+
+    @Query("SELECT COUNT(s) FROM ShortenedUrl s WHERE s.user = :user " +
+            "AND (s.expiresAt IS NULL OR s.expiresAt > :now)")
+    long countActiveByUser(@Param("user") User user, @Param("now") LocalDateTime now);
 }
