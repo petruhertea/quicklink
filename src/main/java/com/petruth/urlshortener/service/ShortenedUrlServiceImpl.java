@@ -136,6 +136,7 @@ public class ShortenedUrlServiceImpl implements ShortenedUrlService {
      * CHANGED: Use @CacheEvict with specific key instead of allEntries
      */
     @Override
+    @Transactional
     @CacheEvict(value = "urls", key = "#url.code")
     public void delete(ShortenedUrl url) {
         shortenedUrlRepository.delete(url);
