@@ -67,9 +67,6 @@ services:
       - key: SPRING_DATASOURCE_HIKARI_MAX_LIFETIME
         value: "540000"
 
-      - key: SPRING_DATASOURCE_HIKARI_CONNECTION_TEST_QUERY
-        value: "SELECT 1"
-
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
         value: validate
 
