@@ -53,7 +53,7 @@ services:
 
       # --- Spring / HikariCP tuning -----------------------------------
       - key: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
-        value: "5"
+        value: "10"
 
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
         value: validate
