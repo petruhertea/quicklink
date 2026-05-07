@@ -1,6 +1,8 @@
 package com.petruth.urlshortener.config;
 
 
+import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.HikariPoolMXBean;
 import org.springframework.boot.health.contributor.Health;
 import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.context.annotation.Bean;
@@ -20,15 +22,30 @@ public class HealthCheckConfig {
     public HealthIndicator databaseHealthIndicator(DataSource dataSource) {
         return () -> {
             try {
+                // Test actual connectivity
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
                 jdbcTemplate.queryForObject("SELECT 1", Integer.class);
-                return Health.up()
-                        .withDetail("database", "PostgreSQL")
-                        .withDetail("status", "Connected")
-                        .build();
+
+                // Also check HikariCP pool state
+                if (dataSource instanceof HikariDataSource hikari) {
+                    HikariPoolMXBean pool = hikari.getHikariPoolMXBean();
+                    int waiting = pool.getThreadsAwaitingConnection();
+                    if (waiting > 3) {
+                        return Health.down()
+                                .withDetail("reason", "Connection pool near exhaustion")
+                                .withDetail("threads_waiting", waiting)
+                                .build();
+                    }
+                    return Health.up()
+                            .withDetail("active_connections", pool.getActiveConnections())
+                            .withDetail("idle_connections", pool.getIdleConnections())
+                            .withDetail("threads_waiting", waiting)
+                            .build();
+                }
+
+                return Health.up().withDetail("database", "Connected").build();
             } catch (Exception e) {
                 return Health.down()
-                        .withDetail("database", "PostgreSQL")
                         .withDetail("error", e.getMessage())
                         .build();
             }

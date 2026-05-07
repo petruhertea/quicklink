@@ -9,11 +9,16 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.dao.TransientDataAccessException;
+import org.springframework.dao.QueryTimeoutException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -75,6 +80,15 @@ public class ShortenedUrlServiceImpl implements ShortenedUrlService {
 
     @Override
     @Cacheable(value = "urls", key = "#code")
+    @Retryable(
+            maxRetries = 3,
+            multiplier = 2,
+            delay = 500,
+            maxDelay = 3000,
+            includes = { TransientDataAccessException.class,
+                    QueryTimeoutException.class,
+                    CannotAcquireLockException.class }
+    )
     public ShortenedUrl findByCode(String code) {
         return shortenedUrlRepository.findByCode(code)
                 .orElseThrow(() -> new RuntimeException("URL with code: " + code + " not found"));
@@ -86,6 +100,12 @@ public class ShortenedUrlServiceImpl implements ShortenedUrlService {
      */
     @Override
     @Transactional
+    @Retryable(
+            includes = { TransientDataAccessException.class, QueryTimeoutException.class },
+            maxRetries = 3,
+            delay = 500,
+            multiplier = 2
+    )
     public void incrementClickCount(String code) {
         shortenedUrlRepository.incrementClickCount(code, LocalDateTime.now());
     }
