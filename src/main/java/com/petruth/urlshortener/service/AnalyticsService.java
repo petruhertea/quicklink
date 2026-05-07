@@ -69,7 +69,10 @@ public class AnalyticsService {
     }
 
     private Map<String, String> getGeolocation(String ipAddress) {
-        Map<String, String> empty = Map.of("country", null, "city", null);
+        // Use HashMap instead of Map.of() — HashMap allows null values
+        Map<String, String> empty = new HashMap<>();
+        empty.put("country", null);
+        empty.put("city", null);
 
         if (ipAddress == null
                 || ipAddress.equals("127.0.0.1")
@@ -79,16 +82,17 @@ public class AnalyticsService {
             return empty;
         }
 
-        // Return cached result if we've seen this IP before
         return geoCache.get(ipAddress, ip -> {
             try {
                 String url = GEO_API_URL.formatted(ip);
                 Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+
                 if (response != null && Boolean.TRUE.equals(response.get("success"))) {
-                    return Map.of(
-                            "country", (String) response.getOrDefault("country", null),
-                            "city",    (String) response.getOrDefault("city", null)
-                    );
+                    Map<String, String> result = new HashMap<>();
+                    // getOrDefault returns null safely, HashMap stores it fine
+                    result.put("country", (String) response.get("country"));
+                    result.put("city",    (String) response.get("city"));
+                    return result;
                 }
             } catch (Exception e) {
                 log.warn("Geo lookup failed for {}: {}", ip, e.getMessage());
