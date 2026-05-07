@@ -80,15 +80,6 @@ public class ShortenedUrlServiceImpl implements ShortenedUrlService {
 
     @Override
     @Cacheable(value = "urls", key = "#code")
-    @Retryable(
-            maxRetries = 3,
-            multiplier = 2,
-            delay = 500,
-            maxDelay = 3000,
-            includes = { TransientDataAccessException.class,
-                    QueryTimeoutException.class,
-                    CannotAcquireLockException.class }
-    )
     public ShortenedUrl findByCode(String code) {
         return shortenedUrlRepository.findByCode(code)
                 .orElseThrow(() -> new RuntimeException("URL with code: " + code + " not found"));
@@ -116,6 +107,15 @@ public class ShortenedUrlServiceImpl implements ShortenedUrlService {
      */
     @Override
     @Cacheable(value = "urls", key = "#code")
+    @Retryable(
+            maxRetries = 3,
+            multiplier = 2,
+            delay = 500,
+            maxDelay = 3000,
+            includes = { TransientDataAccessException.class,
+                    QueryTimeoutException.class,
+                    CannotAcquireLockException.class }
+    )
     public ShortenedUrl findByCodeForRedirect(String code) {
         return shortenedUrlRepository.findByCode(code)
                 .orElseThrow(() -> new RuntimeException("URL with code: " + code + " not found"));
