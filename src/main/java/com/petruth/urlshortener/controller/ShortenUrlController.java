@@ -2,6 +2,7 @@ package com.petruth.urlshortener.controller;
 
 import com.petruth.urlshortener.dto.BulkUrlRequest;
 import com.petruth.urlshortener.dto.BulkUrlResponse;
+import com.petruth.urlshortener.dto.ClickContext;
 import com.petruth.urlshortener.dto.UrlRequest;
 import com.petruth.urlshortener.entity.ShortenedUrl;
 import com.petruth.urlshortener.entity.User;
@@ -304,11 +305,17 @@ public class ShortenUrlController {
                     .body("<html><body><h1>410 - Link Expired</h1><p>This shortened link has expired and is no longer available.</p></body></html>");
         }
 
+        ClickContext ctx = new ClickContext(
+                getClientIP(request),
+                request.getHeader("User-Agent"),
+                request.getHeader("Referer")
+        );
+
         // OPTIMIZED: Use direct SQL update - doesn't invalidate cache
         shortenedUrlService.incrementClickCount(code);
 
         // Record detailed analytics (async recommended for production)
-        analyticsService.recordClick(shortenedUrl, request);
+        analyticsService.recordClick(shortenedUrl, ctx);
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(shortenedUrl.getLongUrl()))
@@ -400,5 +407,12 @@ public class ShortenUrlController {
 
     public String getBaseUrl() {
         return ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+    }
+    private String getClientIP(HttpServletRequest request) {
+        String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader != null && !xfHeader.isEmpty()) {
+            return xfHeader.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 }
